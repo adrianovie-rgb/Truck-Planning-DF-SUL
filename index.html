@@ -107,7 +107,7 @@
   body { background: #fff !important; font-size: 11px; }
 
   /* Ocultar elementos de UI */
-  .upload-panel, .btn-generate, .upload-status { display: none !important; }
+  .upload-panel, .btn-generate, .upload-status, .btn-print { display: none !important; }
 
   /* Header compacto */
   .site-header { height: 36px !important; padding: 0 12px !important; }
@@ -156,6 +156,11 @@
   <div class="header-body">
     <div class="header-title">Truck Planning DF-SUL &mdash; Outbound First Mile</div>
 
+  </div>
+  <div style="margin-left:auto">
+    <button onclick="window.print()" style="background:transparent;border:1px solid #FF9900;color:#FF9900;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px">
+      🖨 Imprimir A4
+    </button>
   </div>
 </div>
 
