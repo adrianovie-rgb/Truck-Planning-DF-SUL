@@ -5,83 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Truck Planning DF-SUL — Outbound First Mile</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js">
-// ──────────────────────────────────────────────────────────────
-// MODAL DE IMPRESSÃO
-// ──────────────────────────────────────────────────────────────
-function openPrintModal() {
-  const list = document.getElementById('pmNodeList');
-  list.innerHTML = '';
-
-  // Montar lista de nodes únicos com cor
-  const seen = new Set();
-  for (const lane of DF_SUL_LANES) {
-    const node = lane.split('->')[0];
-    const dest = lane.split('->').slice(1).join('->');
-    const color = NODE_COLOR[node] || '#374151';
-    if (seen.has(lane)) continue;
-    seen.add(lane);
-
-    const item = document.createElement('label');
-    item.className = 'pm-item';
-    item.innerHTML = `
-      <input type="checkbox" class="pm-node-cb" value="${lane}" checked>
-      <span class="pm-item-tag" style="background:${color}">${node}</span>
-      <span class="pm-item-lane">→ ${dest}</span>
-      <span class="pm-item-ppp">PPP ${PPP[node]}</span>`;
-    list.appendChild(item);
-  }
-
-  // Sync "selecionar todos"
-  document.getElementById('pmSelectAll').checked = true;
-  document.getElementById('printOverlay').classList.add('open');
-
-  // Atualizar checkbox "todos" conforme seleção individual
-  list.querySelectorAll('.pm-node-cb').forEach(cb => {
-    cb.addEventListener('change', syncSelectAll);
-  });
-}
-
-function syncSelectAll() {
-  const all = document.querySelectorAll('.pm-node-cb');
-  const checked = document.querySelectorAll('.pm-node-cb:checked');
-  document.getElementById('pmSelectAll').checked = all.length === checked.length;
-  document.getElementById('pmSelectAll').indeterminate = checked.length > 0 && checked.length < all.length;
-}
-
-function toggleAllNodes(checked) {
-  document.querySelectorAll('.pm-node-cb').forEach(cb => cb.checked = checked);
-}
-
-function closePrintModal() {
-  document.getElementById('printOverlay').classList.remove('open');
-}
-
-function confirmPrint() {
-  const selected = new Set(
-    [...document.querySelectorAll('.pm-node-cb:checked')].map(cb => cb.value)
-  );
-
-  // Ocultar lanes não selecionadas
-  const cards = document.querySelectorAll('.lane-card');
-  cards.forEach(card => {
-    const lane = card.getAttribute('data-lane');
-    card.style.display = selected.has(lane) ? '' : 'none';
-  });
-
-  closePrintModal();
-  setTimeout(() => {
-    window.print();
-    // Restaurar após impressão
-    cards.forEach(card => card.style.display = '');
-  }, 300);
-}
-
-// Fechar modal ao clicar fora
-document.getElementById('printOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closePrintModal();
-});
-
-</script>
 <style>
   /* ── Amazon Theme ── */
   :root {
@@ -677,6 +600,85 @@ function updateHeaderWeeks(laneData) {
   }
 }
 updateHeaderWeeks(DEFAULT_DATA);
+
+// ──────────────────────────────────────────────────────────────
+// MODAL DE IMPRESSÃO
+// ──────────────────────────────────────────────────────────────
+function openPrintModal() {
+  const list = document.getElementById('pmNodeList');
+  list.innerHTML = '';
+
+  // Montar lista de nodes únicos com cor
+  const seen = new Set();
+  for (const lane of DF_SUL_LANES) {
+    const node = lane.split('->')[0];
+    const dest = lane.split('->').slice(1).join('->');
+    const color = NODE_COLOR[node] || '#374151';
+    if (seen.has(lane)) continue;
+    seen.add(lane);
+
+    const item = document.createElement('label');
+    item.className = 'pm-item';
+    item.innerHTML = `
+      <input type="checkbox" class="pm-node-cb" value="${lane}" checked>
+      <span class="pm-item-tag" style="background:${color}">${node}</span>
+      <span class="pm-item-lane">→ ${dest}</span>
+      <span class="pm-item-ppp">PPP ${PPP[node]}</span>`;
+    list.appendChild(item);
+  }
+
+  // Sync "selecionar todos"
+  document.getElementById('pmSelectAll').checked = true;
+  document.getElementById('printOverlay').classList.add('open');
+
+  // Atualizar checkbox "todos" conforme seleção individual
+  list.querySelectorAll('.pm-node-cb').forEach(cb => {
+    cb.addEventListener('change', syncSelectAll);
+  });
+}
+
+function syncSelectAll() {
+  const all = document.querySelectorAll('.pm-node-cb');
+  const checked = document.querySelectorAll('.pm-node-cb:checked');
+  document.getElementById('pmSelectAll').checked = all.length === checked.length;
+  document.getElementById('pmSelectAll').indeterminate = checked.length > 0 && checked.length < all.length;
+}
+
+function toggleAllNodes(checked) {
+  document.querySelectorAll('.pm-node-cb').forEach(cb => cb.checked = checked);
+}
+
+function closePrintModal() {
+  document.getElementById('printOverlay').classList.remove('open');
+}
+
+function confirmPrint() {
+  const selected = new Set(
+    [...document.querySelectorAll('.pm-node-cb:checked')].map(cb => cb.value)
+  );
+
+  // Ocultar lanes não selecionadas
+  const cards = document.querySelectorAll('.lane-card');
+  cards.forEach(card => {
+    const lane = card.getAttribute('data-lane');
+    card.style.display = selected.has(lane) ? '' : 'none';
+  });
+
+  closePrintModal();
+  setTimeout(() => {
+    window.print();
+    // Restaurar após impressão
+    cards.forEach(card => card.style.display = '');
+  }, 300);
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('printOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePrintModal();
+});
+
+</script>
+
 </script>
 </body>
 </html>
