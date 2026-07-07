@@ -4,7 +4,84 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Truck Planning DF-SUL — Outbound First Mile</title>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js">
+// ──────────────────────────────────────────────────────────────
+// MODAL DE IMPRESSÃO
+// ──────────────────────────────────────────────────────────────
+function openPrintModal() {
+  const list = document.getElementById('pmNodeList');
+  list.innerHTML = '';
+
+  // Montar lista de nodes únicos com cor
+  const seen = new Set();
+  for (const lane of DF_SUL_LANES) {
+    const node = lane.split('->')[0];
+    const dest = lane.split('->').slice(1).join('->');
+    const color = NODE_COLOR[node] || '#374151';
+    if (seen.has(lane)) continue;
+    seen.add(lane);
+
+    const item = document.createElement('label');
+    item.className = 'pm-item';
+    item.innerHTML = `
+      <input type="checkbox" class="pm-node-cb" value="${lane}" checked>
+      <span class="pm-item-tag" style="background:${color}">${node}</span>
+      <span class="pm-item-lane">→ ${dest}</span>
+      <span class="pm-item-ppp">PPP ${PPP[node]}</span>`;
+    list.appendChild(item);
+  }
+
+  // Sync "selecionar todos"
+  document.getElementById('pmSelectAll').checked = true;
+  document.getElementById('printOverlay').classList.add('open');
+
+  // Atualizar checkbox "todos" conforme seleção individual
+  list.querySelectorAll('.pm-node-cb').forEach(cb => {
+    cb.addEventListener('change', syncSelectAll);
+  });
+}
+
+function syncSelectAll() {
+  const all = document.querySelectorAll('.pm-node-cb');
+  const checked = document.querySelectorAll('.pm-node-cb:checked');
+  document.getElementById('pmSelectAll').checked = all.length === checked.length;
+  document.getElementById('pmSelectAll').indeterminate = checked.length > 0 && checked.length < all.length;
+}
+
+function toggleAllNodes(checked) {
+  document.querySelectorAll('.pm-node-cb').forEach(cb => cb.checked = checked);
+}
+
+function closePrintModal() {
+  document.getElementById('printOverlay').classList.remove('open');
+}
+
+function confirmPrint() {
+  const selected = new Set(
+    [...document.querySelectorAll('.pm-node-cb:checked')].map(cb => cb.value)
+  );
+
+  // Ocultar lanes não selecionadas
+  const cards = document.querySelectorAll('.lane-card');
+  cards.forEach(card => {
+    const lane = card.getAttribute('data-lane');
+    card.style.display = selected.has(lane) ? '' : 'none';
+  });
+
+  closePrintModal();
+  setTimeout(() => {
+    window.print();
+    // Restaurar após impressão
+    cards.forEach(card => card.style.display = '');
+  }, 300);
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('printOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePrintModal();
+});
+
+</script>
 <style>
   /* ── Amazon Theme ── */
   :root {
@@ -97,46 +174,70 @@
   .rec{display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;font-family:monospace;font-size:12.5px}
   .na{color:#94A3B8;font-style:italic}
   code{background:#F1F5F9;padding:2px 6px;border-radius:3px;font-size:12px}
+  /* ── Modal de seleção de impressão ── */
+  .print-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center}
+  .print-overlay.open{display:flex}
+  .print-modal{background:#fff;border-radius:12px;width:420px;max-width:95vw;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+  .pm-header{background:#131921;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #FF9900}
+  .pm-header h3{color:#fff;font-size:15px;font-weight:700;margin:0}
+  .pm-close{background:none;border:none;color:#8fa3b1;font-size:20px;cursor:pointer;line-height:1;padding:0 4px}
+  .pm-close:hover{color:#fff}
+  .pm-body{padding:16px 20px;overflow-y:auto;flex:1}
+  .pm-select-all{display:flex;align-items:center;gap:8px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #E5E7EB;font-size:13px;font-weight:700;color:#131921;cursor:pointer}
+  .pm-list{display:flex;flex-direction:column;gap:8px}
+  .pm-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s;border:1px solid #E5E7EB}
+  .pm-item:hover{background:#FFF8EE;border-color:#FF9900}
+  .pm-item input[type=checkbox]{width:16px;height:16px;accent-color:#FF9900;cursor:pointer;flex-shrink:0}
+  .pm-item-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+  .pm-item-lane{font-size:12px;color:#565959;flex:1}
+  .pm-item-ppp{font-size:11px;color:#888;font-family:monospace;flex-shrink:0}
+  .pm-footer{padding:14px 20px;background:#F8F9FA;border-top:1px solid #E5E7EB;display:flex;gap:10px;justify-content:flex-end}
+  .pm-btn{padding:9px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:background .2s}
+  .pm-btn-cancel{background:#fff;border:1px solid #D5D9D9;color:#565959}
+  .pm-btn-cancel:hover{background:#F8F9FA}
+  .pm-btn-print{background:#FF9900;color:#131921}
+  .pm-btn-print:hover{background:#E68900}
+
   @media print {
   /* ── A4 retrato ── */
-  @page {
-    size: A4 portrait;
-    margin: 12mm 10mm 12mm 10mm;
-  }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  body { background: #fff !important; font-size: 11px; }
+  @page { size:A4 portrait; margin:12mm 10mm 12mm 10mm }
+  *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important }
+  body{ background:#fff !important; font-size:11px }
 
-  /* Ocultar elementos de UI */
-  .upload-panel, .btn-generate, .upload-status, .btn-print { display: none !important; }
+  /* Ocultar UI */
+  .upload-panel,.btn-generate,.upload-status,.print-overlay{ display:none !important }
 
   /* Header compacto */
-  .site-header { height: 36px !important; padding: 0 12px !important; }
-  .amz-logo-text { font-size: 15px !important; }
-  .header-title  { font-size: 12px !important; }
+  .site-header{ height:36px !important; padding:0 12px !important }
+  .amz-logo-text{ font-size:15px !important }
+  .header-title{ font-size:12px !important }
+  .btn-print-header{ display:none !important }
 
-  /* Info bar compacta */
-  .info-bar { font-size: 10px !important; line-height: 1.5; padding: 6px 10px; }
+  /* Info bar */
+  .info-bar{ font-size:10px !important; line-height:1.5; padding:6px 10px }
 
-  /* Lane cards sem quebra interna */
-  .lane-card { break-inside: avoid; page-break-inside: avoid; margin-bottom: 10px; box-shadow: none; }
-  .lane-header { padding: 8px 12px !important; }
-  .lane-name  { font-size: 13px !important; }
+  /* Cards */
+  .lane-card{ break-inside:avoid; page-break-inside:avoid; margin-bottom:10px; box-shadow:none }
+  .lane-header{ padding:8px 12px !important }
+  .lane-name{ font-size:13px !important }
 
-  /* Tabelas ajustadas */
-  .wk-tables { flex-wrap: wrap; gap: 8px; padding: 6px 8px; }
-  .wk-block  { flex: 1 1 auto; min-width: 0; }
-  th, td     { padding: 4px 7px !important; font-size: 10px !important; }
-  .wk-label  { font-size: 9px !important; }
+  /* Tabelas */
+  .wk-tables{ flex-wrap:wrap; gap:6px; padding:6px 8px }
+  .wk-block{ flex:1 1 auto; min-width:0 }
+  th,td{ padding:4px 7px !important; font-size:10px !important }
+  .wk-label{ font-size:9px !important }
 
-  /* Summary compacto */
-  .summary-section { margin-bottom: 10px; padding: 8px 12px; }
-  .summary-table th, .summary-table td { padding: 4px 10px !important; font-size: 10px !important; }
+  /* Summary */
+  .summary-section{ margin-bottom:10px; padding:8px 12px }
+  .summary-table th,.summary-table td{ padding:4px 10px !important; font-size:10px !important }
 
   /* Legenda */
-  .opt-legend { padding: 6px 10px; font-size: 10px; margin-bottom: 8px; }
+  .opt-legend{ padding:6px 10px; font-size:10px; margin-bottom:8px }
 
-  /* Report sem padding excessivo */
-  .report-wrap { padding: 8px 0; }
+  /* Margens justificadas */
+  .report-wrap{ padding:8px 0; width:100% }
+  table{ width:100%; table-layout:auto }
+  .wk-block table{ width:100% }
 }
 </style>
 </head>
@@ -158,9 +259,30 @@
 
   </div>
   <div style="margin-left:auto">
-    <button onclick="window.print()" style="background:transparent;border:1px solid #FF9900;color:#FF9900;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px">
+    <button class="btn-print-header" onclick="openPrintModal()" style="background:transparent;border:1px solid #FF9900;color:#FF9900;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px">
       🖨 Imprimir A4
     </button>
+  </div>
+</div>
+
+<!-- Modal de Seleção de Impressão -->
+<div class="print-overlay" id="printOverlay">
+  <div class="print-modal">
+    <div class="pm-header">
+      <h3>🖨 Selecionar Nodes para Impressão</h3>
+      <button class="pm-close" onclick="closePrintModal()">✕</button>
+    </div>
+    <div class="pm-body">
+      <label class="pm-select-all">
+        <input type="checkbox" id="pmSelectAll" checked onchange="toggleAllNodes(this.checked)">
+        Selecionar todos
+      </label>
+      <div class="pm-list" id="pmNodeList"></div>
+    </div>
+    <div class="pm-footer">
+      <button class="pm-btn pm-btn-cancel" onclick="closePrintModal()">Cancelar</button>
+      <button class="pm-btn pm-btn-print" onclick="confirmPrint()">🖨 Imprimir</button>
+    </div>
   </div>
 </div>
 
@@ -367,7 +489,7 @@ function renderAll(laneData, source='default') {
         <table><thead><tr><th>Data</th><th>Forecast<br><small>pct</small></th><th>Shuttles<br><small>nec.</small></th><th>Opção 1<br><small>Carreta+</small></th><th>Opção 2<br><small>Truck+</small></th><th>Planejado<br><small>TP</small></th><th>Status</th></tr></thead>
         <tbody>${tbody}</tbody></table></div>`;
     }
-    cardsHtml += `<div class="lane-card">
+    cardsHtml += `<div class="lane-card" data-lane="${lane}">
       <div class="lane-header" style="border-left:4px solid ${color};background:linear-gradient(90deg,${color}12,#fff 40%)">
         <span class="lane-tag" style="background:${color}">${node}</span>
         <span class="lane-name">${lane}</span><span class="lane-ppp">PPP&nbsp;${(PPP[node]||'—').toString().replace('.',',')}&nbsp;pct/sh</span>
