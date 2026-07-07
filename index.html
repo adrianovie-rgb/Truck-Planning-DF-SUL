@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Truck Planning DF-SUL — Outbound First Mile</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<style>
+  /* ── Amazon Theme ── */
+  :root {
+    --amz-blue: #00A8E1;
+    --amz-dark: #232F3E;
+    --amazon-orange: #FF9900;
+    --bg: #F5F7FA;
+    --card: #FFFFFF;
+    --border: #D5D9D9;
+    --txt: #0F1111;
+    --txt2: #565959;
+    --font: "Amazon Ember","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh}
+
+  /* ─ Header ─ */
+  .site-header{background:#131921;padding:0 24px;display:flex;align-items:center;gap:0;height:54px;border-bottom:3px solid #FF9900}
+  .amz-logo{display:flex;align-items:center;gap:0;text-decoration:none;padding-right:20px;border-right:1px solid #3a4553;margin-right:20px}
+  .amz-logo-text{font-size:21px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1;font-style:italic}
+  .amz-smile{display:block;width:46px;height:8px;margin-top:-1px}
+  .header-body{display:flex;flex-direction:column;justify-content:center;gap:1px}
+  .header-title{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
+  .header-sub{color:#8fa3b1;font-size:12px;font-weight:400}
+  .header-weeks{color:#FF9900;font-weight:700;font-size:12px}
+
+  /* ─ Upload Panel ─ */
+  .upload-panel{background:#fff;border-bottom:2px solid var(--amz-blue);padding:28px 32px}
+  .upload-panel h2{font-size:17px;font-weight:700;color:var(--amz-dark);margin-bottom:6px}
+  .upload-panel p{font-size:13px;color:var(--txt2);margin-bottom:20px}
+  .upload-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+  .upload-card{flex:1;min-width:260px;border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
+  .upload-card:hover,.upload-card.drag-over{border-color:var(--amz-blue);background:#F0FAFF}
+  .upload-card.ready{border-color:#067D62;background:#F0FAF5;border-style:solid}
+  .upload-card input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .upload-icon{font-size:32px;margin-bottom:8px}
+  .upload-card .card-title{font-size:14px;font-weight:700;color:var(--amz-dark);margin-bottom:4px}
+  .upload-card .card-sub{font-size:12px;color:var(--txt2)}
+  .upload-card .file-name{font-size:12px;font-weight:600;color:#067D62;margin-top:8px}
+  .btn-generate{background:var(--amazon-orange);color:var(--amz-dark);border:none;padding:12px 32px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s}
+  .btn-generate:hover{background:#E68900}
+  .btn-generate:disabled{background:#D5D9D9;color:#888;cursor:not-allowed}
+  .upload-status{font-size:12.5px;color:var(--txt2);margin-top:8px}
+
+  /* ─ Report ─ */
+  .report-wrap{padding:20px 24px;max-width:1600px;margin:0 auto}
+  .info-bar{background:#EBF5FB;border:1px solid #AED6F1;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:#154360;line-height:1.8}
+  .opt-legend{display:flex;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;align-items:center}
+  .opt-pill{display:inline-block;padding:2px 9px;border-radius:4px;font-weight:700;font-size:11.5px}
+  .op1{background:#DBEAFE;color:#1e40af}
+  .op2{background:#EDE9FE;color:#5b21b6}
+  .status-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--txt2)}
+
+  /* ─ Summary ─ */
+  .summary-section{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:20px}
+  .summary-section h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:12px}
+  .summary-table{border-collapse:collapse;font-size:13px}
+  .summary-table th{padding:7px 18px;background:#F8F9FA;border:1px solid var(--border);font-weight:600;font-size:12px}
+  .summary-table td{padding:7px 18px;border:1px solid var(--border);text-align:center}
+
+  /* ─ Lane Cards ─ */
+  .lane-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .lane-header{padding:13px 20px;display:flex;align-items:center;gap:12px}
+  .lane-tag{padding:3px 10px;border-radius:4px;font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff}
+  .lane-name{font-size:15px;font-weight:700}
+  .lane-ppp{font-size:11px;color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:4px;padding:2px 8px;margin-left:10px;font-family:monospace;white-space:nowrap}
+  .no-data-bar{background:#FEFCE8;border-top:1px solid #FDE68A;padding:8px 20px;font-size:12.5px;color:#92400E}
+  .wk-tables{padding:10px 14px;display:flex;gap:12px;overflow-x:auto}
+  .wk-block{flex:0 0 auto}
+  .wk-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2);margin-bottom:5px;padding-left:1px}
+
+  /* ─ Tables ─ */
+  table{border-collapse:collapse;font-size:13px}
+  th{background:#F8F9FA;padding:7px 11px;border:1px solid var(--border);font-weight:600;font-size:11.5px;color:var(--txt2);text-align:center;white-space:nowrap}
+  td{padding:7px 11px;border:1px solid var(--border);text-align:center;vertical-align:middle;white-space:nowrap}
+  .dc{font-weight:600;color:var(--txt2)}
+  .vc{font-weight:700;font-family:monospace;font-size:13.5px}
+  .sc{font-family:monospace}
+  .row-ok   {background:#F0FDF4}
+  .row-low  {background:#FFFBEB}
+  .row-under{background:#FEF2F2}
+  .row-excess{background:#FFF7ED}
+  .row-nd   {background:#F8F9FA}
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .b-ok    {background:#DCFCE7;color:#166534}
+  .b-low   {background:#FEF3C7;color:#92400E}
+  .b-under {background:#FEE2E2;color:#991B1B}
+  .b-excess{background:#FFEDD5;color:#9A3412}
+  .b-nd    {background:#F1F5F9;color:#64748B}
+  .rec{display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;font-family:monospace;font-size:12.5px}
+  .na{color:#94A3B8;font-style:italic}
+  code{background:#F1F5F9;padding:2px 6px;border-radius:3px;font-size:12px}
+  @media print {
+  /* ── A4 retrato ── */
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm 12mm 10mm;
+  }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: #fff !important; font-size: 11px; }
+
+  /* Ocultar elementos de UI */
+  .upload-panel, .btn-generate, .upload-status { display: none !important; }
+
+  /* Header compacto */
+  .site-header { height: 36px !important; padding: 0 12px !important; }
+  .amz-logo-text { font-size: 15px !important; }
+  .header-title  { font-size: 12px !important; }
+
+  /* Info bar compacta */
+  .info-bar { font-size: 10px !important; line-height: 1.5; padding: 6px 10px; }
+
+  /* Lane cards sem quebra interna */
+  .lane-card { break-inside: avoid; page-break-inside: avoid; margin-bottom: 10px; box-shadow: none; }
+  .lane-header { padding: 8px 12px !important; }
+  .lane-name  { font-size: 13px !important; }
+
+  /* Tabelas ajustadas */
+  .wk-tables { flex-wrap: wrap; gap: 8px; padding: 6px 8px; }
+  .wk-block  { flex: 1 1 auto; min-width: 0; }
+  th, td     { padding: 4px 7px !important; font-size: 10px !important; }
+  .wk-label  { font-size: 9px !important; }
+
+  /* Summary compacto */
+  .summary-section { margin-bottom: 10px; padding: 8px 12px; }
+  .summary-table th, .summary-table td { padding: 4px 10px !important; font-size: 10px !important; }
+
+  /* Legenda */
+  .opt-legend { padding: 6px 10px; font-size: 10px; margin-bottom: 8px; }
+
+  /* Report sem padding excessivo */
+  .report-wrap { padding: 8px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="site-header">
+  <a class="amz-logo" href="#" onclick="return false">
+    <div>
+      <div class="amz-logo-text">amazon</div>
+      <svg class="amz-smile" viewBox="0 0 100 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 5 Q50 22 95 5" stroke="#FF9900" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <polygon points="88,2 97,8 90,12" fill="#FF9900"/>
+      </svg>
+    </div>
+  </a>
+  <div class="header-body">
+    <div class="header-title">Truck Planning DF-SUL &mdash; Outbound First Mile</div>
+
+  </div>
+</div>
+
+<!-- Upload Panel -->
+<div class="upload-panel" id="uploadPanel">
+  <h2>Carregar Arquivos para Gerar o Relatório</h2>
+  <p>Selecione ou arraste os dois arquivos Excel abaixo. O relatório será gerado automaticamente.</p>
+  <div class="upload-row">
+    <div class="upload-card" id="cardForecast" ondragover="dv(event,'cardForecast')" ondragleave="dl('cardForecast')" ondrop="dp(event,'forecast')">
+      <input type="file" accept=".xlsx,.xls" onchange="loadFile(event,'forecast')">
+      <div class="upload-icon">📊</div>
+      <div class="card-title">Forecast SOP</div>
+      <div class="card-sub">Aba: Forecast<br>Nodes DF-SUL por data</div>
+      <div class="file-name" id="nameForecast">Nenhum arquivo selecionado</div>
+    </div>
+    <div class="upload-card" id="cardTP" ondragover="dv(event,'cardTP')" ondragleave="dl('cardTP')" ondrop="dp(event,'tp')">
+      <input type="file" accept=".xlsx,.xls" onchange="loadFile(event,'tp')">
+      <div class="upload-icon">🚚</div>
+      <div class="card-title">Truck Planning EF</div>
+      <div class="card-sub">Aba: DailyOpt trucks<br>13 lanes DF-SUL</div>
+      <div class="file-name" id="nameTP">Nenhum arquivo selecionado</div>
+    </div>
+  </div>
+  <button class="btn-generate" id="btnGen" onclick="generateFromFiles()" disabled>▶ Gerar Relatório</button>
+  <div class="upload-status" id="uploadStatus">Aguardando os dois arquivos para habilitar a geração.</div>
+</div>
+
+<!-- Report -->
+<div class="report-wrap" id="reportWrap">
+  <div class="opt-legend">
+    <span class="opt-pill op1">Opção 1</span> Mix eficiente — Carreta(s) para a base + veículo menor para completar
+    &nbsp;|&nbsp;
+    <span class="opt-pill op2">Opção 2</span> Veículos menores — Truck(s) como base, sem Carreta
+    &nbsp;&nbsp;
+    <span class="status-legend">
+      <span class="badge b-ok">✓ OK</span> 90–110% &nbsp;
+      <span class="badge b-excess">↑ Excesso</span> &gt;110% &nbsp;
+      <span class="badge b-low">⚠ Baixo</span> 70–89% &nbsp;
+      <span class="badge b-under">✗ Insuf</span> &lt;70%
+    </span>
+  </div>
+  <div class="info-bar" id="infoBar"></div>
+  <div class="summary-section">
+    <h2>Resumo de Status — Planejado vs. Necessário</h2>
+    <div id="summaryContent"></div>
+  </div>
+  <div id="laneCards"></div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────────────────────
+// CONSTANTES
+// ──────────────────────────────────────────────────────────────
+const DF_SUL_LANES = [
+  // Hubs → destino
+  'ECB8->CGH7','EGO8->EUB8','ELO8->CGH7','ERS8->CGH7','ESE8->CGH7',
+  // Satélites → Hub (com planejado)
+  'EIJ8->ESE8','EME8->ESE8','EMR8->ELO8','EUM8->ESE8','ESB8->EGO8',
+  // Satélites → Hub (sem lane no DailyOpt)
+  'EXS9->ERS8','EJO8->ECB8','EVE8->ELO8'
+];
+const PPP = {
+  ECB8:220, EJO8:110, EMR8:158, ELO8:155, EME8:250,
+  EIJ8:190, EUM8:175, EVE8:200, ERS8:180, ESE8:208,
+  EGO8:242, ESB8:245, EXS9:142
+};
+const CAP_SH = {Carreta:28, Truck:16, Toco:12, '3/4':8, VUC:6};
+const TT_MAP = {
+  FORTY_EIGHT_FOOT_TRUCK:'Carreta',
+  FORTY_FOOT_TRUCK:'Truck',
+  TWENTY_SIX_FOOT_BOX_TRUCK:'Toco',
+  TWENTY_FOOT_BOX_TRUCK:'Toco',
+  THIRTY_FOOT_BOX_TRUCK:'Truck',
+  FOURTEEN_FOOT_VAN:'VUC'
+};
+const NODE_COLOR = {
+  // Hubs
+  ECB8:'#374151', EGO8:'#7C3AED', ELO8:'#065F46', ERS8:'#1A73E8', ESE8:'#0891B2',
+  // Satélites (tom mais claro do hub pai)
+  EIJ8:'#0E7490', EME8:'#0E7490', EUM8:'#0E7490',   // → ESE8
+  EMR8:'#047857', EVE8:'#047857',                    // → ELO8
+  EXS9:'#1D4ED8',                                    // → ERS8
+  EJO8:'#4B5563',                                    // → ECB8
+  ESB8:'#6D28D9'                                     // → EGO8
+};
+const WKS = {"WK27":["2026-06-29","2026-06-30","2026-07-01","2026-07-02","2026-07-03"],"WK28":["2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10"],"WK29":["2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17"]};
+
+// ──────────────────────────────────────────────────────────────
+// DADOS DEFAULT (gerado em 04/07/2026)
+// ──────────────────────────────────────────────────────────────
+const DEFAULT_DATA = {"ECB8->CGH7":{"WK27":[{"date":"29/06","vol":17168,"shuttles":78.0,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"low"},{"date":"30/06","vol":14845,"shuttles":67.5,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"ok"},{"date":"01/07","vol":14182,"shuttles":64.5,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"ok"},{"date":"02/07","vol":13462,"shuttles":61.2,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"excess"},{"date":"03/07","vol":13178,"shuttles":59.9,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"excess"}],"WK28":[{"date":"06/07","vol":20881,"shuttles":94.9,"sh_plan":96,"planned":"3×Carreta, 1×Toco","match":"ok"},{"date":"07/07","vol":20244,"shuttles":92.0,"sh_plan":96,"planned":"3×Carreta, 1×Toco","match":"ok"},{"date":"08/07","vol":15113,"shuttles":68.7,"sh_plan":96,"planned":"3×Carreta, 1×Toco","match":"excess"},{"date":"09/07","vol":11308,"shuttles":51.4,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"excess"},{"date":"10/07","vol":10634,"shuttles":48.3,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"excess"}],"WK29":[{"date":"13/07","vol":17420,"shuttles":79.2,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"low"},{"date":"14/07","vol":9547,"shuttles":43.4,"sh_plan":40,"planned":"1×Carreta, 1×Toco","match":"ok"},{"date":"15/07","vol":8206,"shuttles":37.3,"sh_plan":40,"planned":"1×Carreta, 1×Toco","match":"ok"},{"date":"16/07","vol":7661,"shuttles":34.8,"sh_plan":40,"planned":"1×Carreta, 1×Toco","match":"excess"},{"date":"17/07","vol":7629,"shuttles":34.7,"sh_plan":40,"planned":"1×Carreta, 1×Toco","match":"excess"}]},"EGO8->EUB8":{"WK27":[{"date":"29/06","vol":1843,"shuttles":7.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"30/06","vol":1591,"shuttles":6.6,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"01/07","vol":1589,"shuttles":6.6,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"02/07","vol":1863,"shuttles":7.7,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"03/07","vol":1591,"shuttles":6.6,"sh_plan":12,"planned":"1×Toco","match":"excess"}],"WK28":[{"date":"06/07","vol":2247,"shuttles":9.3,"sh_plan":0,"planned":"-","match":"under"},{"date":"07/07","vol":2250,"shuttles":9.3,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"08/07","vol":1710,"shuttles":7.1,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"09/07","vol":1557,"shuttles":6.4,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"10/07","vol":1349,"shuttles":5.6,"sh_plan":12,"planned":"1×Toco","match":"excess"}],"WK29":[{"date":"13/07","vol":1889,"shuttles":7.8,"sh_plan":0,"planned":"-","match":"under"},{"date":"14/07","vol":995,"shuttles":4.1,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"15/07","vol":916,"shuttles":3.8,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"16/07","vol":1077,"shuttles":4.5,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"17/07","vol":968,"shuttles":4.0,"sh_plan":12,"planned":"1×Toco","match":"excess"}]},"ELO8->CGH7":{"WK27":[{"date":"29/06","vol":7524,"shuttles":48.5,"sh_plan":0,"planned":"-","match":"under"},{"date":"30/06","vol":5795,"shuttles":37.4,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"01/07","vol":6298,"shuttles":40.6,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"02/07","vol":5918,"shuttles":38.2,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"03/07","vol":6079,"shuttles":39.2,"sh_plan":84,"planned":"3×Carreta","match":"excess"}],"WK28":[{"date":"06/07","vol":9217,"shuttles":59.5,"sh_plan":0,"planned":"-","match":"under"},{"date":"07/07","vol":8155,"shuttles":52.6,"sh_plan":112,"planned":"4×Carreta","match":"excess"},{"date":"08/07","vol":6821,"shuttles":44.0,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"09/07","vol":4907,"shuttles":31.7,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"10/07","vol":4757,"shuttles":30.7,"sh_plan":84,"planned":"3×Carreta","match":"excess"}],"WK29":[{"date":"13/07","vol":7990,"shuttles":51.5,"sh_plan":0,"planned":"-","match":"under"},{"date":"14/07","vol":3939,"shuttles":25.4,"sh_plan":56,"planned":"2×Carreta","match":"excess"},{"date":"15/07","vol":3810,"shuttles":24.6,"sh_plan":56,"planned":"2×Carreta","match":"excess"},{"date":"16/07","vol":3398,"shuttles":21.9,"sh_plan":56,"planned":"2×Carreta","match":"excess"},{"date":"17/07","vol":3407,"shuttles":22.0,"sh_plan":56,"planned":"2×Carreta","match":"excess"}]},"ERS8->CGH7":{"WK27":[{"date":"29/06","vol":4237,"shuttles":23.5,"sh_plan":24,"planned":"2×Toco","match":"ok"},{"date":"30/06","vol":3508,"shuttles":19.5,"sh_plan":12,"planned":"1×Toco","match":"under"},{"date":"01/07","vol":3341,"shuttles":18.6,"sh_plan":12,"planned":"1×Toco","match":"under"},{"date":"02/07","vol":3774,"shuttles":21.0,"sh_plan":12,"planned":"1×Toco","match":"under"},{"date":"03/07","vol":3437,"shuttles":19.1,"sh_plan":12,"planned":"1×Toco","match":"under"}],"WK28":[{"date":"06/07","vol":5115,"shuttles":28.4,"sh_plan":24,"planned":"2×Toco","match":"low"},{"date":"07/07","vol":5195,"shuttles":28.9,"sh_plan":24,"planned":"2×Toco","match":"low"},{"date":"08/07","vol":3859,"shuttles":21.4,"sh_plan":24,"planned":"2×Toco","match":"excess"},{"date":"09/07","vol":3249,"shuttles":18.1,"sh_plan":12,"planned":"1×Toco","match":"under"},{"date":"10/07","vol":2779,"shuttles":15.4,"sh_plan":12,"planned":"1×Toco","match":"low"}],"WK29":[{"date":"13/07","vol":4718,"shuttles":26.2,"sh_plan":12,"planned":"1×Toco","match":"under"},{"date":"14/07","vol":2548,"shuttles":14.2,"sh_plan":6,"planned":"1×VUC","match":"under"},{"date":"15/07","vol":2062,"shuttles":11.5,"sh_plan":6,"planned":"1×VUC","match":"under"},{"date":"16/07","vol":2265,"shuttles":12.6,"sh_plan":6,"planned":"1×VUC","match":"under"},{"date":"17/07","vol":1997,"shuttles":11.1,"sh_plan":6,"planned":"1×VUC","match":"under"}]},"ESE8->CGH7":{"WK27":[{"date":"29/06","vol":9044,"shuttles":43.5,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"30/06","vol":6398,"shuttles":30.8,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"01/07","vol":6388,"shuttles":30.7,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"02/07","vol":6541,"shuttles":31.4,"sh_plan":84,"planned":"3×Carreta","match":"excess"},{"date":"03/07","vol":6476,"shuttles":31.1,"sh_plan":84,"planned":"3×Carreta","match":"excess"}],"WK28":[{"date":"06/07","vol":11009,"shuttles":52.9,"sh_plan":96,"planned":"3×Carreta, 1×Toco","match":"excess"},{"date":"07/07","vol":8608,"shuttles":41.4,"sh_plan":96,"planned":"3×Carreta, 1×Toco","match":"excess"},{"date":"08/07","vol":6574,"shuttles":31.6,"sh_plan":96,"planned":"3×Carreta, 1×Toco","match":"excess"},{"date":"09/07","vol":5389,"shuttles":25.9,"sh_plan":96,"planned":"3×Carreta, 1×Toco","match":"excess"},{"date":"10/07","vol":4901,"shuttles":23.6,"sh_plan":68,"planned":"2×Carreta, 1×Toco","match":"excess"}],"WK29":[{"date":"13/07","vol":9232,"shuttles":44.4,"sh_plan":56,"planned":"2×Carreta","match":"excess"},{"date":"14/07","vol":4371,"shuttles":21.0,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"15/07","vol":4074,"shuttles":19.6,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"16/07","vol":3873,"shuttles":18.6,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"17/07","vol":3754,"shuttles":18.0,"sh_plan":28,"planned":"1×Carreta","match":"excess"}]},"EIJ8->ESE8":{"WK27":[{"date":"29/06","vol":2053,"shuttles":10.8,"sh_plan":24,"planned":"2×Toco","match":"excess"},{"date":"30/06","vol":1600,"shuttles":8.4,"sh_plan":22,"planned":"1×Truck, 1×VUC","match":"excess"},{"date":"01/07","vol":1716,"shuttles":9.0,"sh_plan":28,"planned":"1×Toco, 1×Truck","match":"excess"},{"date":"02/07","vol":1676,"shuttles":8.8,"sh_plan":28,"planned":"1×Toco, 1×Truck","match":"excess"},{"date":"03/07","vol":1839,"shuttles":9.7,"sh_plan":22,"planned":"1×Truck, 1×VUC","match":"excess"}],"WK28":[{"date":"06/07","vol":2581,"shuttles":13.6,"sh_plan":40,"planned":"2×Toco, 1×Truck","match":"excess"},{"date":"07/07","vol":2214,"shuttles":11.7,"sh_plan":18,"planned":"1×Toco, 1×VUC","match":"excess"},{"date":"08/07","vol":1777,"shuttles":9.4,"sh_plan":28,"planned":"1×Toco, 1×Truck","match":"excess"},{"date":"09/07","vol":1355,"shuttles":7.1,"sh_plan":22,"planned":"1×Truck, 1×VUC","match":"excess"},{"date":"10/07","vol":1290,"shuttles":6.8,"sh_plan":12,"planned":"1×Toco","match":"excess"}],"WK29":[{"date":"13/07","vol":2219,"shuttles":11.7,"sh_plan":18,"planned":"1×Toco, 1×VUC","match":"excess"},{"date":"14/07","vol":1123,"shuttles":5.9,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"15/07","vol":1118,"shuttles":5.9,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"16/07","vol":990,"shuttles":5.2,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"17/07","vol":1068,"shuttles":5.6,"sh_plan":12,"planned":"1×Toco","match":"excess"}]},"EME8->ESE8":{"WK27":[{"date":"29/06","vol":3700,"shuttles":14.8,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"30/06","vol":2557,"shuttles":10.2,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"01/07","vol":2402,"shuttles":9.6,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"02/07","vol":2567,"shuttles":10.3,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"03/07","vol":2095,"shuttles":8.4,"sh_plan":12,"planned":"1×Toco","match":"excess"}],"WK28":[{"date":"06/07","vol":4347,"shuttles":17.4,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"07/07","vol":3362,"shuttles":13.4,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"08/07","vol":2435,"shuttles":9.7,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"09/07","vol":2143,"shuttles":8.6,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"10/07","vol":1613,"shuttles":6.5,"sh_plan":16,"planned":"1×Truck","match":"excess"}],"WK29":[{"date":"13/07","vol":3696,"shuttles":14.8,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"14/07","vol":1766,"shuttles":7.1,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"15/07","vol":1566,"shuttles":6.3,"sh_plan":6,"planned":"1×VUC","match":"ok"},{"date":"16/07","vol":1570,"shuttles":6.3,"sh_plan":6,"planned":"1×VUC","match":"ok"},{"date":"17/07","vol":1217,"shuttles":4.9,"sh_plan":16,"planned":"1×Truck","match":"excess"}]},"EMR8->ELO8":{"WK27":[{"date":"29/06","vol":3270,"shuttles":20.7,"sh_plan":24,"planned":"2×Toco","match":"excess"},{"date":"30/06","vol":2463,"shuttles":15.6,"sh_plan":12,"planned":"1×Toco","match":"low"},{"date":"01/07","vol":2704,"shuttles":17.1,"sh_plan":12,"planned":"1×Toco","match":"low"},{"date":"02/07","vol":2715,"shuttles":17.2,"sh_plan":12,"planned":"1×Toco","match":"under"},{"date":"03/07","vol":2612,"shuttles":16.5,"sh_plan":12,"planned":"1×Toco","match":"low"}],"WK28":[{"date":"06/07","vol":4016,"shuttles":25.4,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"07/07","vol":3628,"shuttles":23.0,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"08/07","vol":3119,"shuttles":19.7,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"09/07","vol":2323,"shuttles":14.7,"sh_plan":12,"planned":"1×Toco","match":"low"},{"date":"10/07","vol":2108,"shuttles":13.3,"sh_plan":12,"planned":"1×Toco","match":"ok"}],"WK29":[{"date":"13/07","vol":3535,"shuttles":22.4,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"14/07","vol":1757,"shuttles":11.1,"sh_plan":12,"planned":"1×Toco","match":"ok"},{"date":"15/07","vol":1671,"shuttles":10.6,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"16/07","vol":1616,"shuttles":10.2,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"17/07","vol":1476,"shuttles":9.3,"sh_plan":12,"planned":"1×Toco","match":"excess"}]},"EUM8->ESE8":{"WK27":[{"date":"29/06","vol":1067,"shuttles":6.1,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"30/06","vol":734,"shuttles":4.2,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"01/07","vol":689,"shuttles":3.9,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"02/07","vol":766,"shuttles":4.4,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"03/07","vol":771,"shuttles":4.4,"sh_plan":16,"planned":"1×Truck","match":"excess"}],"WK28":[{"date":"06/07","vol":1309,"shuttles":7.5,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"07/07","vol":953,"shuttles":5.4,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"08/07","vol":694,"shuttles":4.0,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"09/07","vol":631,"shuttles":3.6,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"10/07","vol":618,"shuttles":3.5,"sh_plan":16,"planned":"1×Truck","match":"excess"}],"WK29":[{"date":"13/07","vol":1070,"shuttles":6.1,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"14/07","vol":502,"shuttles":2.9,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"15/07","vol":436,"shuttles":2.5,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"16/07","vol":437,"shuttles":2.5,"sh_plan":16,"planned":"1×Truck","match":"excess"},{"date":"17/07","vol":482,"shuttles":2.8,"sh_plan":16,"planned":"1×Truck","match":"excess"}]},"ESB8->EGO8":{"WK27":[{"date":"29/06","vol":3541,"shuttles":14.5,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"30/06","vol":2642,"shuttles":10.8,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"01/07","vol":3338,"shuttles":13.6,"sh_plan":12,"planned":"1×Toco","match":"low"},{"date":"02/07","vol":3223,"shuttles":13.2,"sh_plan":12,"planned":"1×Toco","match":"ok"},{"date":"03/07","vol":2877,"shuttles":11.7,"sh_plan":12,"planned":"1×Toco","match":"ok"}],"WK28":[{"date":"06/07","vol":4380,"shuttles":17.9,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"07/07","vol":3774,"shuttles":15.4,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"08/07","vol":3731,"shuttles":15.2,"sh_plan":12,"planned":"1×Toco","match":"low"},{"date":"09/07","vol":2695,"shuttles":11.0,"sh_plan":12,"planned":"1×Toco","match":"ok"},{"date":"10/07","vol":2271,"shuttles":9.3,"sh_plan":12,"planned":"1×Toco","match":"excess"}],"WK29":[{"date":"13/07","vol":3784,"shuttles":15.4,"sh_plan":28,"planned":"1×Carreta","match":"excess"},{"date":"14/07","vol":1855,"shuttles":7.6,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"15/07","vol":2095,"shuttles":8.6,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"16/07","vol":1914,"shuttles":7.8,"sh_plan":12,"planned":"1×Toco","match":"excess"},{"date":"17/07","vol":1718,"shuttles":7.0,"sh_plan":12,"planned":"1×Toco","match":"excess"}]},"EXS9->ERS8":{"WK27":[{"date":"29/06","vol":655,"shuttles":4.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"30/06","vol":410,"shuttles":2.9,"sh_plan":0,"planned":"-","match":"under"},{"date":"01/07","vol":434,"shuttles":3.1,"sh_plan":0,"planned":"-","match":"under"},{"date":"02/07","vol":441,"shuttles":3.1,"sh_plan":0,"planned":"-","match":"under"},{"date":"03/07","vol":351,"shuttles":2.5,"sh_plan":0,"planned":"-","match":"under"}],"WK28":[{"date":"06/07","vol":806,"shuttles":5.7,"sh_plan":0,"planned":"-","match":"under"},{"date":"07/07","vol":550,"shuttles":3.9,"sh_plan":0,"planned":"-","match":"under"},{"date":"08/07","vol":460,"shuttles":3.2,"sh_plan":0,"planned":"-","match":"under"},{"date":"09/07","vol":354,"shuttles":2.5,"sh_plan":0,"planned":"-","match":"under"},{"date":"10/07","vol":274,"shuttles":1.9,"sh_plan":0,"planned":"-","match":"under"}],"WK29":[{"date":"13/07","vol":659,"shuttles":4.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"14/07","vol":263,"shuttles":1.9,"sh_plan":0,"planned":"-","match":"under"},{"date":"15/07","vol":257,"shuttles":1.8,"sh_plan":0,"planned":"-","match":"under"},{"date":"16/07","vol":234,"shuttles":1.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"17/07","vol":193,"shuttles":1.4,"sh_plan":0,"planned":"-","match":"under"}]},"EJO8->ECB8":{"WK27":[{"date":"29/06","vol":2372,"shuttles":21.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"30/06","vol":1692,"shuttles":15.4,"sh_plan":0,"planned":"-","match":"under"},{"date":"01/07","vol":1682,"shuttles":15.3,"sh_plan":0,"planned":"-","match":"under"},{"date":"02/07","vol":1562,"shuttles":14.2,"sh_plan":0,"planned":"-","match":"under"},{"date":"03/07","vol":1455,"shuttles":13.2,"sh_plan":0,"planned":"-","match":"under"}],"WK28":[{"date":"06/07","vol":3038,"shuttles":27.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"07/07","vol":2166,"shuttles":19.7,"sh_plan":0,"planned":"-","match":"under"},{"date":"08/07","vol":1555,"shuttles":14.1,"sh_plan":0,"planned":"-","match":"under"},{"date":"09/07","vol":1200,"shuttles":10.9,"sh_plan":0,"planned":"-","match":"under"},{"date":"10/07","vol":928,"shuttles":8.4,"sh_plan":0,"planned":"-","match":"under"}],"WK29":[{"date":"13/07","vol":2352,"shuttles":21.4,"sh_plan":0,"planned":"-","match":"under"},{"date":"14/07","vol":1082,"shuttles":9.8,"sh_plan":0,"planned":"-","match":"under"},{"date":"15/07","vol":1065,"shuttles":9.7,"sh_plan":0,"planned":"-","match":"under"},{"date":"16/07","vol":871,"shuttles":7.9,"sh_plan":0,"planned":"-","match":"under"},{"date":"17/07","vol":781,"shuttles":7.1,"sh_plan":0,"planned":"-","match":"under"}]},"EVE8->ELO8":{"WK27":[{"date":"29/06","vol":925,"shuttles":4.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"30/06","vol":595,"shuttles":3.0,"sh_plan":0,"planned":"-","match":"under"},{"date":"01/07","vol":625,"shuttles":3.1,"sh_plan":0,"planned":"-","match":"under"},{"date":"02/07","vol":648,"shuttles":3.2,"sh_plan":0,"planned":"-","match":"under"},{"date":"03/07","vol":545,"shuttles":2.7,"sh_plan":0,"planned":"-","match":"under"}],"WK28":[{"date":"06/07","vol":1121,"shuttles":5.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"07/07","vol":855,"shuttles":4.3,"sh_plan":0,"planned":"-","match":"under"},{"date":"08/07","vol":728,"shuttles":3.6,"sh_plan":0,"planned":"-","match":"under"},{"date":"09/07","vol":555,"shuttles":2.8,"sh_plan":0,"planned":"-","match":"under"},{"date":"10/07","vol":437,"shuttles":2.2,"sh_plan":0,"planned":"-","match":"under"}],"WK29":[{"date":"13/07","vol":951,"shuttles":4.8,"sh_plan":0,"planned":"-","match":"under"},{"date":"14/07","vol":411,"shuttles":2.1,"sh_plan":0,"planned":"-","match":"under"},{"date":"15/07","vol":389,"shuttles":1.9,"sh_plan":0,"planned":"-","match":"under"},{"date":"16/07","vol":386,"shuttles":1.9,"sh_plan":0,"planned":"-","match":"under"},{"date":"17/07","vol":301,"shuttles":1.5,"sh_plan":0,"planned":"-","match":"under"}]}};
+
+// ──────────────────────────────────────────────────────────────
+// RECOMENDAÇÕES
+// ──────────────────────────────────────────────────────────────
+function opt1(sh) {
+  if (!sh||sh<=0) return 'N/A';
+  if (sh<=12) return '1×Toco';
+  if (sh<=16) return '1×Truck';
+  if (sh<=28) return '1×Carreta';
+  const n=Math.floor(sh/28), r=sh-n*28;
+  if (r===0)  return `${n}×Carreta`;
+  if (r<=12)  return `${n}×Carreta + 1×Toco`;
+  if (r<=16)  return `${n}×Carreta + 1×Truck`;
+  return `${n+1}×Carreta`;
+}
+function opt2(sh) {
+  // Truck base, sem Carreta, sem VAN, menor nº de veículos
+  if (!sh||sh<=0) return 'N/A';
+  if (sh<=12) return '1×Toco';
+  if (sh<=16) return '1×Truck';   // 1 veículo
+  const n=Math.floor(sh/16), r=sh-n*16;
+  if (r===0)  return `${n}×Truck`;
+  if (r<=12)  return `${n}×Truck + 1×Toco`;
+  return `${n+1}×Truck`;
+}
+
+// ──────────────────────────────────────────────────────────────
+// STATUS
+// ──────────────────────────────────────────────────────────────
+function plannedCap(str) {
+  if (!str||str==='-') return 0;
+  return str.split(', ').reduce((s,p)=>{
+    if (!p.includes('×')) return s;
+    const [q,t]=p.split('×'); return s+(parseInt(q)||0)*(CAP_SH[t.trim()]||10);
+  }, 0);
+}
+function matchStatus(shNeed, shPlan) {
+  if (shNeed<=0) return 'nd';
+  if (shPlan===0) return 'under';
+  const r=shPlan/shNeed;
+  if (r>1.1) return 'excess';
+  if (r>=0.9) return 'ok';
+  if (r>=0.7) return 'low';
+  return 'under';
+}
+const BADGE = {
+  ok:   '<span class="badge b-ok">✓ OK</span>',
+  low:  '<span class="badge b-low">⚠ Baixo</span>',
+  under:'<span class="badge b-under">✗ Insuf</span>',
+  excess:'<span class="badge b-excess">↑ Excesso</span>',
+  nd:   '<span class="badge b-nd">— S/dados</span>'
+};
+
+// ──────────────────────────────────────────────────────────────
+// RENDER
+// ──────────────────────────────────────────────────────────────
+function fmtVol(v) { return v?Number(v).toLocaleString('pt-BR'):'—'; }
+
+function renderAll(laneData, source='default') {
+  // Info bar
+  const ts = source==='default' ? 'Dados de 29/06–17/07/2026 (Forecast_SOP_24_06_26)' : 'Dados gerados a partir dos arquivos carregados';
+  document.getElementById('infoBar').innerHTML =
+    `<b>Cálculo:</b> Shuttles = Vol ÷ PPP &nbsp;|&nbsp;
+     <b>PPP (pct/sh):</b> ECB8=220 · ELO8=155 · ERS8=180 · EGO8=242 · ESE8=208 · EIJ8=190 · EME8=250 · EMR8=158 · ESB8=245 · EUM8=175 · EVE8=200 · EXS9=142 · EJO8=110 &nbsp;|&nbsp;
+     <b>Cap/veíc:</b> Toco=12sh · Truck=16sh · Carreta=28sh<br>
+     <span style="color:#7C3AED"><b>EGO8</b>: somente lane EUB8</span> &nbsp;|&nbsp;
+     <span style="color:#374151"><b>EXS9, EJO8, EVE8</b>: sem lane no DailyOpt — planejado não disponível</span> &nbsp;|&nbsp;
+     <span style="color:#565959">${ts}</span>`;
+
+  // Summary
+  const counts = {WK28:{ok:0,low:0,under:0,excess:0,nd:0},WK29:{ok:0,low:0,under:0,excess:0,nd:0},WK30:{ok:0,low:0,under:0,excess:0,nd:0}};
+  for (const lane of DF_SUL_LANES) {
+    for (const wk of ['WK28','WK29','WK30']) {
+      const rows = (laneData[lane]||{})[wk]||[];
+      for (const d of rows) {
+        const shp = plannedCap(d.planned);
+        const m = matchStatus(d.shuttles||0, shp);
+        counts[wk][m]++;
+      }
+    }
+  }
+  let sumHtml = '<table class="summary-table"><thead><tr><th>Semana</th><th>✓ OK</th><th>↑ Excesso</th><th>⚠ Baixo</th><th>✗ Insuf</th><th>— S/dados</th></tr></thead><tbody>';
+  for (const [wk,c] of Object.entries(counts)) {
+    sumHtml += `<tr><td><b>${wk}</b></td><td style="color:#166534;font-weight:700">${c.ok}</td><td style="color:#9A3412;font-weight:700">${c.excess}</td><td style="color:#92400E;font-weight:700">${c.low}</td><td style="color:#991B1B;font-weight:700">${c.under}</td><td style="color:#64748B">${c.nd}</td></tr>`;
+  }
+  document.getElementById('summaryContent').innerHTML = sumHtml + '</tbody></table>';
+
+  // Lane cards
+  let cardsHtml = '';
+  for (const lane of DF_SUL_LANES) {
+    const node = lane.split('->')[0];
+    const color = NODE_COLOR[node]||'#374151';
+    const hasData = DF_SUL_LANES.includes(lane) && (laneData[lane]?.WK28||[]).some(d=>d.vol);
+    const note = hasData ? '' : `<div class="no-data-bar">⚠ ${node} não presente na Máscara WK28-30 — forecast indisponível</div>`;
+    let tables = '';
+    for (const [wk, dates] of Object.entries(WKS)) {
+      const rows = (laneData[lane]||{})[wk]||[];
+      let tbody = '';
+      for (const d of rows) {
+        const sh = d.shuttles||0;
+        const o1 = opt1(sh), o2 = opt2(sh);
+        const shp = plannedCap(d.planned);
+        const m = matchStatus(sh, shp);
+        const rc = `row-${m}`;
+        const o1h = o1!=='N/A'?`<span class="rec op1">${o1}</span>`:'<span class="na">N/A</span>';
+        const o2h = o2!=='N/A'?`<span class="rec op2">${o2}</span>`:'<span class="na">N/A</span>';
+        const ph = d.planned&&d.planned!=='-'?`<code>${d.planned}</code>`:'<span class="na">—</span>';
+        const sh_fmt = sh?`<b>${sh}</b>`:'<span class="na">—</span>';
+        const vl = fmtVol(d.vol);
+        tbody += `<tr class="${rc}"><td class="dc">${d.date}</td><td class="vc">${vl}</td><td class="sc">${sh_fmt}</td><td>${o1h}</td><td>${o2h}</td><td>${ph}</td><td>${BADGE[m]}</td></tr>`;
+      }
+      tables += `<div class="wk-block"><div class="wk-label">${wk}</div>
+        <table><thead><tr><th>Data</th><th>Forecast<br><small>pct</small></th><th>Shuttles<br><small>nec.</small></th><th>Opção 1<br><small>Carreta+</small></th><th>Opção 2<br><small>Truck+</small></th><th>Planejado<br><small>TP</small></th><th>Status</th></tr></thead>
+        <tbody>${tbody}</tbody></table></div>`;
+    }
+    cardsHtml += `<div class="lane-card">
+      <div class="lane-header" style="border-left:4px solid ${color};background:linear-gradient(90deg,${color}12,#fff 40%)">
+        <span class="lane-tag" style="background:${color}">${node}</span>
+        <span class="lane-name">${lane}</span><span class="lane-ppp">PPP&nbsp;${(PPP[node]||'—').toString().replace('.',',')}&nbsp;pct/sh</span>
+      </div>${note}<div class="wk-tables">${tables}</div></div>`;
+  }
+  document.getElementById('laneCards').innerHTML = cardsHtml;
+}
+
+// ──────────────────────────────────────────────────────────────
+// FILE UPLOAD & PARSING
+// ──────────────────────────────────────────────────────────────
+let wbForecast=null, wbTP=null;
+
+function dv(e,id){e.preventDefault();document.getElementById(id).classList.add('drag-over')}
+function dl(id){document.getElementById(id).classList.remove('drag-over')}
+function dp(e,type){e.preventDefault();dl(type==='forecast'?'cardForecast':'cardTP');const f=e.dataTransfer.files[0];if(f)processFile(f,type)}
+
+function loadFile(e,type){processFile(e.target.files[0],type)}
+
+function processFile(file,type) {
+  const nameEl = document.getElementById(type==='forecast'?'nameForecast':'nameTP');
+  const cardEl = document.getElementById(type==='forecast'?'cardForecast':'cardTP');
+  nameEl.textContent = '⏳ Carregando...';
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, {type:'array', cellDates:false});
+      if (type==='forecast') wbForecast=wb; else wbTP=wb;
+      nameEl.textContent = '✓ ' + file.name;
+      cardEl.classList.add('ready');
+      checkBothReady();
+    } catch(err) {
+      nameEl.textContent = '✗ Erro ao ler arquivo';
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function checkBothReady() {
+  const ready = wbForecast && wbTP;
+  document.getElementById('btnGen').disabled = !ready;
+  document.getElementById('uploadStatus').textContent = ready
+    ? '✓ Ambos os arquivos prontos. Clique em Gerar Relatório.'
+    : 'Aguardando ' + (!wbForecast?'Forecast SOP':'Truck Planning') + '...';
+}
+
+// ──────────────────────────────────────────────────────────────
+// PARSE TRUCK PLANNING
+// ──────────────────────────────────────────────────────────────
+function parseTruckPlanning(wb) {
+  const ws = wb.Sheets['DailyOpt trucks'];
+  if (!ws) throw new Error('Sheet "DailyOpt trucks" não encontrada');
+  const data = XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+  const hdr = data[0]||[];
+  const dateCols = {};
+  for (let c=12; c<hdr.length; c++) {
+    const v=hdr[c];
+    if (typeof v==='number' && v>40000) {
+      const ms=(v-25569)*86400000;
+      const d=new Date(ms);
+      const ds=`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+      dateCols[c]=ds;
+    }
+  }
+  const tpData={};
+  for (let r=1; r<data.length; r++) {
+    const row=data[r]; if(!row) continue;
+    const lane=String(row[0]||'').trim();
+    if (!DF_SUL_LANES.includes(lane)) continue;
+    const truck=TT_MAP[String(row[8]||'').trim()]||String(row[8]||'').substring(0,12);
+    if (!tpData[lane]) tpData[lane]={};
+    for (const [c,ds] of Object.entries(dateCols)) {
+      const qty=parseInt(row[c])||0;
+      if (qty>0) {
+        if (!tpData[lane][ds]) tpData[lane][ds]={};
+        tpData[lane][ds][truck]=(tpData[lane][ds][truck]||0)+qty;
+      }
+    }
+  }
+  return tpData;
+}
+
+// ──────────────────────────────────────────────────────────────
+// PARSE FORECAST SOP
+// ──────────────────────────────────────────────────────────────
+function parseForecast(wb) {
+  const ws = wb.Sheets['Forecast'];
+  if (!ws) throw new Error('Aba "Forecast" não encontrada no arquivo');
+  const data = XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+  const hdr = data[0]||[];
+  const HUB = Object.keys(PPP);
+
+  // Mapear colunas de data — formato "DD/MM/YYYY" ou serial Excel
+  const dateColMap={};
+  for (let c=5;c<hdr.length;c++){
+    const v=hdr[c];
+    if (typeof v==='string' && v.includes('/')) {
+      const pts=v.split('/');
+      if (pts.length===3) dateColMap[c]=`${pts[2]}-${pts[1].padStart(2,'0')}-${pts[0].padStart(2,'0')}`;
+    } else if (typeof v==='number' && v>40000) {
+      const ms=(v-25569)*86400000, d=new Date(ms);
+      dateColMap[c]=`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+    }
+  }
+
+  const forecast={};
+  for (let r=1;r<data.length;r++){
+    const row=data[r]||[];
+    const node=String(row[0]||'').trim();
+    if (!HUB.includes(node)) continue;
+    forecast[node]={};
+    for (const [c,ds] of Object.entries(dateColMap)){
+      const v=row[c];
+      if (v!=null && typeof v==='number' && v>0) forecast[node][ds]=Math.round(v);
+    }
+  }
+  return {forecast, allDates: Object.values(dateColMap)};
+}
+
+// Agrupar datas por semana ISO (Seg-Sex)
+function buildWKS(allDates) {
+  const wks={};
+  for (const ds of allDates.sort()){
+    const d=new Date(ds+'T00:00:00Z');
+    const dow=d.getUTCDay();
+    if (dow===0||dow===6) continue;
+    // ISO week
+    const jan4=new Date(Date.UTC(d.getUTCFullYear(),0,4));
+    const startW1=new Date(jan4); startW1.setUTCDate(jan4.getUTCDate()-((jan4.getUTCDay()||7)-1));
+    const wkNum=Math.floor((d-startW1)/(7*864e5))+1;
+    const key=`WK${wkNum}`;
+    if (!wks[key]) wks[key]=[];
+    if (!wks[key].includes(ds)) wks[key].push(ds);
+  }
+  return wks;
+}
+
+
+function generateFromFiles() {
+  const status = document.getElementById('uploadStatus');
+  try {
+    status.textContent = '⏳ Processando arquivos...';
+    const tpData = parseTruckPlanning(wbTP);
+    const {forecast, allDates} = parseForecast(wbForecast);
+
+    // WKS dinâmico a partir das datas do Forecast
+    const dynWKS = buildWKS(allDates);
+
+    const laneData={};
+    for (const lane of DF_SUL_LANES) {
+      const node=lane.split('->')[0];
+
+      laneData[lane]={};
+      for (const [wk,dates] of Object.entries(dynWKS)) {
+        laneData[lane][wk]=dates.map(ds=>{
+          const vol=(forecast[node]||{})[ds]||null;
+          const planned=(tpData[lane]||{})[ds]||{};
+          const pStr=Object.entries(planned).sort().map(([t,q])=>`${q}×${t}`).join(', ')||'-';
+          const dd=ds.slice(8,10), mm=ds.slice(5,7);
+          const shPlan = plannedCap(pStr);
+          return {date:`${dd}/${mm}`,vol,shuttles:sh,sh_plan:shPlan,planned:pStr,match:matchStatus(sh,shPlan)};
+        });
+      }
+    }
+    // Atualizar WKS global para o render
+    Object.keys(WKS).forEach(k=>delete WKS[k]);
+    Object.assign(WKS, dynWKS);
+    status.textContent = '✓ Relatório gerado com sucesso!';
+    renderAll(laneData,'upload');
+  } catch(err) {
+    status.textContent = '✗ Erro: ' + err.message;
+    console.error(err);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// INICIALIZAR COM DADOS DEFAULT
+// ──────────────────────────────────────────────────────────────
+renderAll(DEFAULT_DATA);
+// Atualizar header com semanas do relatório
+function updateHeaderWeeks(laneData) {
+  const wks = Object.keys(WKS);
+  if (wks.length > 0) {
+  }
+}
+updateHeaderWeeks(DEFAULT_DATA);
+</script>
+</body>
+</html>
