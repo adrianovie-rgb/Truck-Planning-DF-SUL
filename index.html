@@ -513,7 +513,8 @@ function renderAll(laneData, source='default') {
       for (const d of rows) {
         let sh = d.shuttles||0;
         let shBreakdown = '';
-        // ESB8->EGO8: mesmo veículo carrega ESB8 + EGO8 (para em EGO8 e completa a carga)
+        // Rota consolidada ESB8→EGO8: mesmo veículo carrega ESB8 + EGO8
+        // Ambos os cards usam a carga combinada para dimensionamento
         if (lane === 'ESB8->EGO8') {
           const ego8rows = (laneData['EGO8->EUB8']||{})[wk]||[];
           const ego8d = ego8rows.find(r => r.date === d.date);
@@ -521,6 +522,16 @@ function renderAll(laneData, source='default') {
           if (shEgo8 > 0) {
             shBreakdown = `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">ESB8: ${(d.shuttles||0).toFixed(1)} + EGO8: ${shEgo8.toFixed(1)}</div>`;
             sh = parseFloat(((d.shuttles||0) + shEgo8).toFixed(1));
+          }
+        }
+        // EGO8->EUB8: o veículo vem carregado de ESB8 — projetar com carga combinada
+        if (lane === 'EGO8->EUB8') {
+          const esb8rows = (laneData['ESB8->EGO8']||{})[wk]||[];
+          const esb8d = esb8rows.find(r => r.date === d.date);
+          const shEsb8 = esb8d ? (esb8d.shuttles||0) : 0;
+          if (shEsb8 > 0) {
+            shBreakdown = `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">ESB8: ${shEsb8.toFixed(1)} + EGO8: ${(d.shuttles||0).toFixed(1)}</div>`;
+            sh = parseFloat((shEsb8 + (d.shuttles||0)).toFixed(1));
           }
         }
         const o1 = opt1(sh), o2 = opt2(sh);
