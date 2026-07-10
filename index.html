@@ -348,9 +348,11 @@
 // ──────────────────────────────────────────────────────────────
 const DF_SUL_LANES = [
   // Hubs → destino
-  'ECB8->CGH7','EGO8->EUB8','ELO8->CGH7','ERS8->CGH7','ESE8->CGH7',
+  'ECB8->CGH7','ELO8->CGH7','ERS8->CGH7','ESE8->CGH7',
   // Satélites → Hub (com planejado)
-  'EIJ8->ESE8','EME8->ESE8','EMR8->ELO8','EUM8->ESE8','ESB8->EGO8',
+  'EIJ8->ESE8','EME8->ESE8','EMR8->ELO8','EUM8->ESE8',
+  // ESB8→EGO8 + EGO8 logo abaixo (mesmo veículo, carga consolidada)
+  'ESB8->EGO8','EGO8->EUB8',
   // Satélites → Hub (sem lane no DailyOpt)
   'EXS9->ERS8','EJO8->ECB8','EVE8->ELO8'
 ];
@@ -420,11 +422,35 @@ function plannedCap(str) {
     const [q,t]=p.split('×'); return s+(parseInt(q)||0)*(CAP_SH[t.trim()]||10);
   }, 0);
 }
+// Tiers de veículo considerados no planejado (Carreta→Truck→Toco→3/4)
+const PLAN_TIERS = [28, 16, 12, 8];
+
+// Retorna a menor capacidade possível após rebaixar 1 veículo por um tier
+function minDowngrade(shPlan) {
+  let best = shPlan; // pior caso: não consegue rebaixar nada
+  for (const cap of PLAN_TIERS) {
+    if (shPlan >= cap) {
+      const idx = PLAN_TIERS.indexOf(cap);
+      // Tentar substituir um veículo desse tier pelo tier inferior
+      const nextCap = idx < PLAN_TIERS.length - 1 ? PLAN_TIERS[idx + 1] : 0;
+      const reduced = shPlan - cap + nextCap; // substitui por menor (ou remove)
+      if (reduced < best) best = reduced;
+    }
+  }
+  return best;
+}
+
 function matchStatus(shNeed, shPlan) {
   if (shNeed<=0) return 'nd';
   if (shPlan===0) return 'under';
   const r=shPlan/shNeed;
-  if (r>1.1) return 'excess';
+  if (r>1.1) {
+    // Excesso: verificar se é a configuração mínima viável
+    // (rebaixar qualquer veículo por um tier já tornaria insuficiente)
+    const afterDowngrade = minDowngrade(shPlan);
+    if (afterDowngrade < shNeed * 0.9) return 'ok'; // mínimo viável → OK
+    return 'excess';
+  }
   if (r>=0.9) return 'ok';
   if (r>=0.7) return 'low';
   return 'under';
@@ -476,7 +502,7 @@ function renderAll(laneData, source='default') {
   for (const lane of DF_SUL_LANES) {
     const node = lane.split('->')[0];
     const color = NODE_COLOR[node]||'#374151';
-    const laneTag = lane === 'ESB8->EGO8' ? ' <span style="background:rgba(55,65,81,.5);border:1px solid rgba(124,58,237,.4);color:#a78bfa;font-size:9px;border-radius:4px;padding:1px 5px;font-weight:600;letter-spacing:.5px;vertical-align:middle">⊕ EGO8 incluso</span>' : '';
+    const laneTag = lane === 'ESB8->EGO8' ? ' <span style="background:none;border:1px solid rgba(124,58,237,.4);color:#a78bfa;font-size:9px;border-radius:4px;padding:1px 5px;font-weight:600;letter-spacing:.5px;vertical-align:middle">⊕ EGO8 incluso</span>' : '';
     const hasData = DF_SUL_LANES.includes(lane) && (laneData[lane]?.WK28||[]).some(d=>d.vol);
     let note = hasData ? '' : `<div class="no-data-bar">⚠ ${node} não presente na Máscara WK28-30 — forecast indisponível</div>`;
     if (node === 'EGO8') note += `<div class="no-data-bar" style="background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.3)">⊕ Carga consolidada no veículo ESB8→EGO8 — o veículo que sai de ESB8 para em EGO8 para completar a carga</div>`;
