@@ -162,6 +162,39 @@
   table{ width:100%; table-layout:auto }
   .wk-block table{ width:100% }
 }
+
+  /* ─ Bottom Row: Summary + Calc + Glossary ─ */
+  .bottom-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}
+  .bottom-row .summary-section{flex:0 0 auto;min-width:340px;margin-bottom:0}
+  .calc-card,.glossary-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;flex:1 1 220px}
+  .calc-card h2,.glossary-card h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:8px;margin:0 0 12px}
+  .calc-group{display:flex;flex-direction:column;gap:8px}
+  .calc-group label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+  .calc-group input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--text);width:100%;box-sizing:border-box;outline:none}
+  .calc-group input:focus{border-color:var(--amz-orange)}
+  .btn-calc{margin-top:12px;width:100%;background:var(--amz-orange);color:#000;border:none;border-radius:7px;padding:9px 0;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px}
+  .btn-calc:hover{background:#e8960f}
+  .glossary-card table{width:100%;border-collapse:collapse;font-size:11px}
+  .glossary-card th{background:var(--bg);padding:5px 8px;text-align:left;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)}
+  .glossary-card td{padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+  .glossary-card tr:last-child td{border-bottom:none}
+  .glossary-card .badge-sh{background:var(--amz-orange);color:#000;font-weight:700;border-radius:4px;padding:2px 6px;font-size:11px}
+  /* ─ Calc Result Modal ─ */
+  #calcOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;align-items:center;justify-content:center}
+  #calcOverlay.open{display:flex}
+  #calcModal{background:var(--card);border-radius:12px;padding:24px 28px;min-width:380px;max-width:520px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.5);position:relative}
+  #calcModal h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin:0 0 16px;border-bottom:1px solid var(--border);padding-bottom:10px}
+  #calcModal .calc-info{font-size:12px;color:var(--text-muted);margin-bottom:16px}
+  #calcModal .calc-info strong{color:var(--amz-orange)}
+  .calc-opt-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+  .calc-opt-block h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin:0 0 8px;color:var(--amz-orange)}
+  .calc-opt-block table{width:100%;border-collapse:collapse;font-size:12px}
+  .calc-opt-block th{color:var(--text-muted);font-weight:600;text-align:left;padding:3px 6px;border-bottom:1px solid var(--border);font-size:11px}
+  .calc-opt-block td{padding:4px 6px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.04)}
+  .calc-opt-block tr:last-child td{border-bottom:none}
+  .calc-opt-block .total-row td{font-weight:700;color:var(--amz-orange);border-top:1px solid var(--border);padding-top:6px}
+  .btn-close-calc{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1}
+  .btn-close-calc:hover{color:var(--amz-orange)}
 </style>
 </head>
 <body>
@@ -248,9 +281,41 @@
     </span>
   </div>
   <div class="info-bar" id="infoBar"></div>
-  <div class="summary-section">
-    <h2>Resumo de Status — Planejado vs. Necessário</h2>
-    <div id="summaryContent"></div>
+  <div class="bottom-row">
+    <div class="summary-section">
+      <h2>Resumo de Status — Planejado vs. Necessário</h2>
+      <div id="summaryContent"></div>
+    </div>
+
+    <!-- ── Calculadora de Truck Planning ── -->
+    <div class="calc-card">
+      <h2>🚛 Calculadora de Truck Planning</h2>
+      <div class="calc-group">
+        <label>Forecast do dia (pacotes)</label>
+        <input type="number" id="calcForecast" placeholder="ex: 3500" min="1">
+        <label>PPP da base (pkgs/shuttle)</label>
+        <input type="number" id="calcPPP" placeholder="ex: 220" min="1">
+        <button class="btn-calc" onclick="openCalcModal()">Calcular opções</button>
+      </div>
+    </div>
+
+    <!-- ── Glossário de Veículos ── -->
+    <div class="glossary-card">
+      <h2>📋 Tipos de Veículo</h2>
+      <table>
+        <thead>
+          <tr><th>Truck Type</th><th>Modelo</th><th>Shuttles</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>FORTY FOOT TRUCK</td><td>VUC</td><td><span class="badge-sh">6</span></td></tr>
+          <tr><td>FOURTEEN FOOT VAN</td><td>3/4</td><td><span class="badge-sh">8</span></td></tr>
+          <tr><td>TWENTY FOOT BOX TRUCK</td><td>Toco</td><td><span class="badge-sh">12</span></td></tr>
+          <tr><td>TWENTY SIX FOOT BOX TRUCK</td><td>Truck</td><td><span class="badge-sh">16</span></td></tr>
+          <tr><td>FORTY EIGHT FOOT TRUCK</td><td>Carreta</td><td><span class="badge-sh">28</span></td></tr>
+          <tr><td>SEVEN FOOT VAN</td><td>Fiorino</td><td><span class="badge-sh">2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div id="laneCards"></div>
 </div>
@@ -677,6 +742,81 @@ document.getElementById('printOverlay').addEventListener('click', function(e) {
   if (e.target === this) closePrintModal();
 });
 
+
+// ────────────────────────────────────────────────────────────────
+// CALCULADORA DE TRUCK PLANNING
+// ────────────────────────────────────────────────────────────────
+const VEHICLES = [
+  {type:'FORTY EIGHT FOOT TRUCK',   model:'Carreta', cap:28},
+  {type:'TWENTY SIX FOOT BOX TRUCK',model:'Truck',   cap:16},
+  {type:'TWENTY FOOT BOX TRUCK',    model:'Toco',    cap:12},
+  {type:'FOURTEEN FOOT VAN',        model:'3/4',     cap:8},
+  {type:'FORTY FOOT TRUCK',         model:'VUC',     cap:6},
+  {type:'SEVEN FOOT VAN',           model:'Fiorino', cap:2},
+];
+
+function calcOption(shuttlesNeeded, vehicleOrder) {
+  let rem = shuttlesNeeded;
+  const result = [];
+  for (const v of vehicleOrder) {
+    if (rem <= 0) break;
+    const qty = Math.floor(rem / v.cap);
+    if (qty > 0) { result.push({...v, qty}); rem -= qty * v.cap; }
+  }
+  if (rem > 0) {
+    const cover = [...vehicleOrder].reverse().find(v => v.cap >= rem) || vehicleOrder[vehicleOrder.length-1];
+    const ex = result.find(r => r.model === cover.model);
+    if (ex) ex.qty++; else result.push({...cover, qty:1});
+  }
+  return result;
+}
+
+function renderOptBlock(label, rows, shuttlesNeeded) {
+  const totalShuttles = rows.reduce((s,r) => s + r.qty * r.cap, 0);
+  const totalVehicles = rows.reduce((s,r) => s + r.qty, 0);
+  const pct = Math.round(totalShuttles / shuttlesNeeded * 100);
+  const rowsHtml = rows.map(r =>
+    '<tr><td>' + r.model + '</td><td>' + r.type + '</td><td style="text-align:center;font-weight:700">' + r.qty + '</td><td style="text-align:center">' + r.cap + '</td><td style="text-align:center">' + (r.qty * r.cap) + '</td></tr>'
+  ).join('');
+  return '<div class="calc-opt-block"><h4>' + label + '</h4><table><thead><tr><th>Modelo</th><th>Tipo</th><th style="text-align:center">Qtd</th><th style="text-align:center">Cap/Veíc</th><th style="text-align:center">Shuttles</th></tr></thead><tbody>' + rowsHtml + '<tr class="total-row"><td colspan="2">Total</td><td style="text-align:center">' + totalVehicles + ' veíc.</td><td></td><td style="text-align:center">' + totalShuttles + ' sh (' + pct + '%)</td></tr></tbody></table></div>';
+}
+
+function openCalcModal() {
+  const forecast = parseInt(document.getElementById('calcForecast').value);
+  const ppp      = parseInt(document.getElementById('calcPPP').value);
+  if (!forecast || forecast <= 0) { alert('Informe o forecast do dia.'); return; }
+  if (!ppp || ppp <= 0)           { alert('Informe o PPP da base.'); return; }
+  const shuttlesNeeded = Math.ceil(forecast / ppp);
+  const opt1 = calcOption(shuttlesNeeded, VEHICLES);
+  const opt2 = calcOption(shuttlesNeeded, VEHICLES.filter(v => v.model !== 'Carreta'));
+  const opt3 = calcOption(shuttlesNeeded, VEHICLES.filter(v => !['Carreta','Truck'].includes(v.model)));
+  document.getElementById('calcInfo').innerHTML =
+    'Forecast: <strong>' + forecast.toLocaleString('pt-BR') + '</strong> pkgs &nbsp;|&nbsp; PPP: <strong>' + ppp + '</strong> &nbsp;|&nbsp; Shuttles necessários: <strong>' + shuttlesNeeded + '</strong>';
+  document.getElementById('calcResults').innerHTML =
+    renderOptBlock('Opção 1 — Carreta base (menor frota)', opt1, shuttlesNeeded) +
+    renderOptBlock('Opção 2 — Truck base (sem Carreta)', opt2, shuttlesNeeded) +
+    renderOptBlock('Opção 3 — Toco base (frota leve)', opt3, shuttlesNeeded);
+  document.getElementById('calcOverlay').classList.add('open');
+}
+
+function closeCalcModal() {
+  document.getElementById('calcOverlay').classList.remove('open');
+}
+
+document.getElementById('calcOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeCalcModal();
+});
+
 </script>
+
+<!-- ── Calc Result Overlay ── -->
+<div id="calcOverlay">
+  <div id="calcModal">
+    <button class="btn-close-calc" onclick="closeCalcModal()">✕</button>
+    <h3>Resultado — Truck Planning</h3>
+    <div class="calc-info" id="calcInfo"></div>
+    <div id="calcResults"></div>
+  </div>
+</div>
 </body>
 </html>
