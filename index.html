@@ -254,34 +254,34 @@
   /* ─ Request Modal ─ */
   #reqOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2100;align-items:center;justify-content:center}
   #reqOverlay.open{display:flex}
-  #reqModal{background:var(--card);border-radius:14px;padding:0;width:min(600px,96vw);max-height:90vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.6);border:1px solid var(--border)}
-  .req-modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  #reqModal{background:#1a1d20;border-radius:14px;padding:0;width:min(600px,96vw);max-height:90vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.6);border:1px solid #2d3035;color:#e8eaed}
+  .req-modal-head{padding:20px 24px 16px;border-bottom:1px solid #2d3035;display:flex;align-items:center;justify-content:space-between;background:#1a1d20;border-radius:14px 14px 0 0}
   .req-modal-head h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin:0}
   .req-modal-head .btn-close-req{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;padding:0 4px}
   .req-modal-head .btn-close-req:hover{color:var(--amz-orange)}
   .req-modal-body{padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
   .req-field{display:flex;flex-direction:column;gap:5px}
   .req-field.full{grid-column:1/-1}
-  .req-field label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px}
-  .req-field .ro{font-size:13px;color:var(--text);font-weight:600;padding:7px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
-  .req-field textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);resize:vertical;min-height:72px;outline:none;font-family:inherit;transition:border-color .15s}
+  .req-field label{font-size:10px;font-weight:700;color:#9aa0a6;text-transform:uppercase;letter-spacing:.7px}
+  .req-field .ro{font-size:13px;color:#e8eaed;font-weight:600;padding:8px 11px;background:#0f1214;border-radius:6px;border:1px solid #2d3035}
+  .req-field textarea{background:#0f1214;border:1px solid #2d3035;border-radius:6px;padding:8px 10px;font-size:12px;color:#e8eaed;resize:vertical;min-height:72px;outline:none;font-family:inherit;transition:border-color .15s}
   .req-field textarea:focus{border-color:var(--amz-orange)}
   /* Vehicle builder */
   .veh-builder{display:flex;flex-direction:column;gap:6px}
   .veh-row{display:flex;gap:6px;align-items:center}
-  .veh-row select,.veh-row input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:12px;outline:none;transition:border-color .15s}
+  .veh-row select,.veh-row input{background:#0f1214;border:1px solid #2d3035;border-radius:6px;color:#e8eaed;padding:5px 8px;font-size:12px;outline:none;transition:border-color .15s}
   .veh-row select:focus,.veh-row input:focus{border-color:var(--amz-orange)}
   .veh-row select{flex:1}
   .veh-row input{width:60px;text-align:center}
   .veh-row .btn-rm{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);color:#fca5a5;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:12px;line-height:1}
   .btn-add-veh{align-self:flex-start;background:rgba(255,153,0,.1);border:1px dashed rgba(255,153,0,.4);color:var(--amz-orange);border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:600;transition:all .15s;margin-top:4px}
   .btn-add-veh:hover{background:rgba(255,153,0,.2)}
-  .veh-preview{margin-top:8px;padding:8px 12px;border-radius:7px;font-size:11px;display:flex;gap:12px;align-items:center}
-  .veh-preview.ok{background:rgba(6,78,58,.3);border:1px solid rgba(110,231,183,.2);color:#6ee7b7}
-  .veh-preview.low{background:rgba(146,64,14,.25);border:1px solid rgba(253,230,138,.2);color:#fde68a}
-  .veh-preview.under{background:rgba(69,10,10,.3);border:1px solid rgba(252,165,165,.2);color:#fca5a5}
-  .veh-preview b{font-size:13px;font-weight:800}
-  .req-modal-foot{padding:14px 24px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+  .veh-preview{margin-top:8px;padding:9px 14px;border-radius:7px;font-size:12px;display:flex;gap:12px;align-items:center;font-weight:600}
+  .veh-preview.ok{background:#064e3b;border:1px solid #065f46;color:#a7f3d0}
+  .veh-preview.low{background:#78350f;border:1px solid #92400e;color:#fde68a}
+  .veh-preview.under{background:#450a0a;border:1px solid #7f1d1d;color:#fca5a5}
+  .veh-preview b{font-size:14px;font-weight:800}
+  .req-modal-foot{padding:14px 24px 18px;border-top:1px solid #2d3035;display:flex;justify-content:flex-end;gap:10px;background:#1a1d20;border-radius:0 0 14px 14px}
   .btn-req-save{background:var(--amz-orange);color:#000;border:none;border-radius:8px;padding:9px 22px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;transition:background .15s}
   .btn-req-save:hover{background:#e8960f}
   .btn-req-cancel{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:9px 16px;font-size:12px;cursor:pointer;transition:all .15s}
@@ -292,13 +292,13 @@
   /* ─ Email Modal ─ */
   #emailOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2200;align-items:center;justify-content:center}
   #emailOverlay.open{display:flex}
-  #emailModal{background:var(--card);border-radius:14px;padding:0;width:min(640px,96vw);max-height:88vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.6);border:1px solid var(--border)}
+  #emailModal{background:#1a1d20;border-radius:14px;padding:0;width:min(640px,96vw);max-height:88vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.6);border:1px solid #2d3035;color:#e8eaed}
   .email-head{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
   .email-head h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin:0}
   .email-body{padding:20px 24px}
   .email-field{margin-bottom:14px}
   .email-field label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
-  .email-field textarea,.email-field input{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--text);outline:none;font-family:monospace;transition:border-color .15s}
+  .email-field textarea,.email-field input{width:100%;box-sizing:border-box;background:#0f1214;border:1px solid #2d3035;border-radius:7px;padding:9px 12px;font-size:12px;color:#e8eaed;outline:none;font-family:monospace;transition:border-color .15s}
   .email-field textarea{min-height:220px;resize:vertical}
   .email-field textarea:focus,.email-field input:focus{border-color:var(--amz-orange)}
   .email-foot{padding:12px 24px 16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
