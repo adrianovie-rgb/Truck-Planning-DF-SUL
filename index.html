@@ -477,13 +477,25 @@ function renderAll(laneData, source='default') {
     const node = lane.split('->')[0];
     const color = NODE_COLOR[node]||'#374151';
     const hasData = DF_SUL_LANES.includes(lane) && (laneData[lane]?.WK28||[]).some(d=>d.vol);
-    const note = hasData ? '' : `<div class="no-data-bar">⚠ ${node} não presente na Máscara WK28-30 — forecast indisponível</div>`;
+    let note = hasData ? '' : `<div class="no-data-bar">⚠ ${node} não presente na Máscara WK28-30 — forecast indisponível</div>`;
+    if (node === 'EGO8') note += `<div class="no-data-bar" style="background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.3)">⊕ Carga consolidada no veículo ECB8→EGO8 — o veículo que sai de ECB8 para em EGO8 para completar a carga</div>`;
     let tables = '';
     for (const [wk, dates] of Object.entries(WKS)) {
       const rows = (laneData[lane]||{})[wk]||[];
       let tbody = '';
       for (const d of rows) {
-        const sh = d.shuttles||0;
+        let sh = d.shuttles||0;
+        let shBreakdown = '';
+        // ECB8->CGH7: mesmo veículo carrega ECB8 + EGO8 (para em EGO8 e completa a carga)
+        if (lane === 'ECB8->CGH7') {
+          const ego8rows = (laneData['EGO8->EUB8']||{})[wk]||[];
+          const ego8d = ego8rows.find(r => r.date === d.date);
+          const shEgo8 = ego8d ? (ego8d.shuttles||0) : 0;
+          if (shEgo8 > 0) {
+            shBreakdown = `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">ECB8: ${(d.shuttles||0).toFixed(1)} + EGO8: ${shEgo8.toFixed(1)}</div>`;
+            sh = parseFloat(((d.shuttles||0) + shEgo8).toFixed(1));
+          }
+        }
         const o1 = opt1(sh), o2 = opt2(sh);
         const shp = plannedCap(d.planned);
         const m = matchStatus(sh, shp);
@@ -491,7 +503,7 @@ function renderAll(laneData, source='default') {
         const o1h = o1!=='N/A'?`<span class="rec op1">${o1}</span>`:'<span class="na">N/A</span>';
         const o2h = o2!=='N/A'?`<span class="rec op2">${o2}</span>`:'<span class="na">N/A</span>';
         const ph = d.planned&&d.planned!=='-'?`<code>${d.planned}</code>`:'<span class="na">—</span>';
-        const sh_fmt = sh?`<b>${sh}</b>`:'<span class="na">—</span>';
+        const sh_fmt = sh?`<b>${sh}</b>${shBreakdown}`:'<span class="na">—</span>';
         const vl = fmtVol(d.vol);
         tbody += `<tr class="${rc}"><td class="dc">${d.date}</td><td class="vc">${vl}</td><td class="sc">${sh_fmt}</td><td>${o1h}</td><td>${o2h}</td><td>${ph}</td><td>${BADGE[m]}</td></tr>`;
       }
@@ -502,7 +514,7 @@ function renderAll(laneData, source='default') {
     cardsHtml += `<div class="lane-card" data-lane="${lane}">
       <div class="lane-header" style="border-left:4px solid ${color};background:linear-gradient(90deg,${color}12,#fff 40%)">
         <span class="lane-tag" style="background:${color}">${node}</span>
-        <span class="lane-name">${lane}</span><span class="lane-ppp">PPP&nbsp;${(PPP[node]||'—').toString().replace('.',',')}&nbsp;pct/sh</span>
+        <span class="lane-name">${lane}</span>${laneTag}<span class="lane-ppp">PPP&nbsp;${(PPP[node]||'—').toString().replace('.',',')}&nbsp;pct/sh</span>
       </div>${note}<div class="wk-tables">${tables}</div></div>`;
   }
   document.getElementById('laneCards').innerHTML = cardsHtml;
@@ -660,6 +672,7 @@ function generateFromFiles() {
           const planned=(tpData[lane]||{})[ds]||{};
           const pStr=Object.entries(planned).sort().map(([t,q])=>`${q}×${t}`).join(', ')||'-';
           const dd=ds.slice(8,10), mm=ds.slice(5,7);
+          const sh = vol ? Math.ceil(vol / (PPP[node]||1)) : 0;
           const shPlan = plannedCap(pStr);
           return {date:`${dd}/${mm}`,vol,shuttles:sh,sh_plan:shPlan,planned:pStr,match:matchStatus(sh,shPlan)};
         });
