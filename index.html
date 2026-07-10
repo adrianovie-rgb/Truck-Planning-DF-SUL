@@ -1132,18 +1132,18 @@ function renderRevisao() {
     <tr data-id="${r.id}">
       <td style="text-align:center"><input type="checkbox" class="req-chk" data-id="${r.id}" onchange="updateSelCount()"></td>
       <td><span class="node-pill" style="background:${getNodeColor(r.node)}">${r.node}</span></td>
-      <td style="color:var(--text-muted);font-size:11px">${r.regional}</td>
+      <td style="color:#565959;font-size:11px">${r.regional}</td>
       <td>${r.lane}</td>
-      <td>${r.date} <span style="color:var(--text-muted);font-size:10px">${r.wk}</span></td>
+      <td>${r.date} <span style="color:#565959;font-size:10px">${r.wk}</span></td>
       <td style="text-align:center">${r.shNeed}</td>
-      <td><code style="font-size:11px">${r.currentPlan}</code></td>
-      <td><code style="font-size:11px;color:var(--amz-orange)">${r.proposed}</code></td>
-      <td style="max-width:180px;font-size:11px;color:var(--text-muted)">${r.justification||'—'}</td>
+      <td><span style="font-size:11px;font-family:monospace;color:#0f1111;background:#e8ecef;border-radius:4px;padding:2px 6px;display:inline-block">${r.currentPlan}</span></td>
+      <td><span style="font-size:11px;font-family:monospace;color:#b45309;background:#fef3c7;border-radius:4px;padding:2px 6px;display:inline-block;font-weight:600">${r.proposed}</span></td>
+      <td style="max-width:180px;min-width:160px;font-size:11px;color:#3d4449;word-break:break-word;overflow-wrap:anywhere">${r.justification||'—'}</td>
       <td><span class="${STATUS_CLASS[r.status]||'pill-pending'}" style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">${STATUS_LABEL[r.status]||'Pendente'}</span></td>
       <td style="white-space:nowrap">
-        <button style="background:rgba(110,231,183,.1);border:1px solid rgba(110,231,183,.25);color:#6ee7b7;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700" onclick="setStatus('${r.id}','approved')">✓</button>
-        <button style="background:rgba(252,165,165,.1);border:1px solid rgba(252,165,165,.25);color:#fca5a5;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700;margin-left:3px" onclick="setStatus('${r.id}','rejected')">✗</button>
-        <button style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;margin-left:3px" onclick="deleteRequest('${r.id}')">🗑</button>
+        <button style="background:#166534;border:1px solid #15803d;color:#bbf7d0;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700" onclick="setStatus('${r.id}','approved')">✓</button>
+        <button style="background:#7f1d1d;border:1px solid #991b1b;color:#fecaca;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700;margin-left:3px" onclick="setStatus('${r.id}','rejected')">✗</button>
+        <button style="background:#e8ecef;border:1px solid #c8cdd2;color:#3d4449;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;margin-left:3px" onclick="deleteRequest('${r.id}')">🗑</button>
       </td>
     </tr>`).join('');
   wrap.innerHTML = `
