@@ -476,6 +476,7 @@ function renderAll(laneData, source='default') {
   for (const lane of DF_SUL_LANES) {
     const node = lane.split('->')[0];
     const color = NODE_COLOR[node]||'#374151';
+    const laneTag = lane === 'ECB8->CGH7' ? ' <span style="background:rgba(55,65,81,.5);border:1px solid rgba(124,58,237,.4);color:#a78bfa;font-size:9px;border-radius:4px;padding:1px 5px;font-weight:600;letter-spacing:.5px;vertical-align:middle">⊕ EGO8 incluso</span>' : '';
     const hasData = DF_SUL_LANES.includes(lane) && (laneData[lane]?.WK28||[]).some(d=>d.vol);
     let note = hasData ? '' : `<div class="no-data-bar">⚠ ${node} não presente na Máscara WK28-30 — forecast indisponível</div>`;
     if (node === 'EGO8') note += `<div class="no-data-bar" style="background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.3)">⊕ Carga consolidada no veículo ECB8→EGO8 — o veículo que sai de ECB8 para em EGO8 para completar a carga</div>`;
