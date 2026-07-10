@@ -1138,7 +1138,7 @@ function renderRevisao() {
       <td style="text-align:center">${r.shNeed}</td>
       <td><span style="font-size:11px;font-family:monospace;color:#0f1111;background:#e8ecef;border-radius:4px;padding:2px 6px;display:inline-block">${r.currentPlan}</span></td>
       <td><span style="font-size:11px;font-family:monospace;color:#b45309;background:#fef3c7;border-radius:4px;padding:2px 6px;display:inline-block;font-weight:600">${r.proposed}</span></td>
-      <td style="max-width:180px;min-width:160px;font-size:11px;color:#3d4449;word-break:break-word;overflow-wrap:anywhere">${r.justification||'—'}</td>
+      <td style="width:200px;max-width:200px"><div style="width:200px;max-width:200px;overflow:hidden;font-size:11px;color:#3d4449;word-break:break-word;overflow-wrap:anywhere;white-space:normal;line-height:1.4">${r.justification||'—'}</div></td>
       <td><span class="${STATUS_CLASS[r.status]||'pill-pending'}" style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">${STATUS_LABEL[r.status]||'Pendente'}</span></td>
       <td style="white-space:nowrap">
         <button style="background:#166534;border:1px solid #15803d;color:#bbf7d0;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700" onclick="setStatus('${r.id}','approved')">✓</button>
