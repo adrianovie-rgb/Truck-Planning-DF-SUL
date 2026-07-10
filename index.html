@@ -164,21 +164,37 @@
 }
 
   /* ─ Bottom Row: Summary + Calc + Glossary ─ */
-  .bottom-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}
-  .bottom-row .summary-section{flex:0 0 auto;min-width:340px;margin-bottom:0}
-  .calc-card,.glossary-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;flex:1 1 220px}
-  .calc-card h2,.glossary-card h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:8px;margin:0 0 12px}
-  .calc-group{display:flex;flex-direction:column;gap:8px}
-  .calc-group label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
-  .calc-group input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--text);width:100%;box-sizing:border-box;outline:none}
-  .calc-group input:focus{border-color:var(--amz-orange)}
-  .btn-calc{margin-top:12px;width:100%;background:var(--amz-orange);color:#000;border:none;border-radius:7px;padding:9px 0;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px}
+  .bottom-row{display:flex;gap:16px;align-items:stretch;flex-wrap:wrap;margin-bottom:20px}
+  .bottom-row .summary-section{flex:0 0 auto;min-width:320px;margin-bottom:0}
+  .calc-card,.glossary-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;flex:1 1 200px;display:flex;flex-direction:column}
+  .calc-card h2,.glossary-card h2{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:8px;margin:0 0 14px;flex:0 0 auto}
+  /* Calculadora */
+  .calc-group{flex:1;display:flex;flex-direction:column}
+  .calc-fields{display:flex;flex-direction:column;gap:10px;flex:1}
+  .calc-field{display:flex;flex-direction:column;gap:4px}
+  .calc-field label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px}
+  .calc-field input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;color:var(--text);width:100%;box-sizing:border-box;outline:none;transition:border-color .15s}
+  .calc-field input:focus{border-color:var(--amz-orange);box-shadow:0 0 0 2px rgba(255,153,0,.15)}
+  .calc-field input::placeholder{color:rgba(255,255,255,.2)}
+  .btn-calc{margin-top:14px;width:100%;background:var(--amz-orange);color:#000;border:none;border-radius:7px;padding:10px 0;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.6px;text-transform:uppercase;flex:0 0 auto;transition:background .15s}
   .btn-calc:hover{background:#e8960f}
-  .glossary-card table{width:100%;border-collapse:collapse;font-size:11px}
-  .glossary-card th{background:var(--bg);padding:5px 8px;text-align:left;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)}
-  .glossary-card td{padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+  /* Glossário */
+  .glossary-card table{width:100%;border-collapse:collapse;font-size:11.5px;flex:1}
+  .glossary-card thead tr{background:var(--bg)}
+  .glossary-card th{padding:6px 10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;font-size:10px;border-bottom:2px solid var(--border)}
+  .glossary-card th:first-child{text-align:left}
+  .glossary-card th:not(:first-child){text-align:center}
+  .glossary-card td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+  .glossary-card td:first-child{text-align:left;font-size:11px;color:var(--text-muted)}
+  .glossary-card td:nth-child(2){text-align:center;font-weight:700;color:var(--text)}
+  .glossary-card td:nth-child(3){text-align:center}
   .glossary-card tr:last-child td{border-bottom:none}
-  .glossary-card .badge-sh{background:var(--amz-orange);color:#000;font-weight:700;border-radius:4px;padding:2px 6px;font-size:11px}
+  .badge-sh{display:inline-block;font-weight:800;border-radius:5px;padding:2px 8px;font-size:11px;min-width:26px;text-align:center}
+  .badge-sh.sh-xs{background:#2d2d2d;color:#aaa}
+  .badge-sh.sh-sm{background:#1d3550;color:#6ab0f5}
+  .badge-sh.sh-md{background:#1e3a2a;color:#5fd48e}
+  .badge-sh.sh-lg{background:#3a2a10;color:var(--amz-orange)}
+  .badge-sh.sh-xl{background:#3a1a10;color:#ff7043}
   /* ─ Calc Result Modal ─ */
   #calcOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;align-items:center;justify-content:center}
   #calcOverlay.open{display:flex}
@@ -289,30 +305,36 @@
 
     <!-- ── Calculadora de Truck Planning ── -->
     <div class="calc-card">
-      <h2>🚛 Calculadora de Truck Planning</h2>
+      <h2>Calculadora de Truck Planning</h2>
       <div class="calc-group">
-        <label>Forecast do dia (pacotes)</label>
-        <input type="number" id="calcForecast" placeholder="ex: 3500" min="1">
-        <label>PPP da base (pkgs/shuttle)</label>
-        <input type="number" id="calcPPP" placeholder="ex: 220" min="1">
+        <div class="calc-fields">
+          <div class="calc-field">
+            <label>Forecast do dia (pacotes)</label>
+            <input type="number" id="calcForecast" placeholder="ex: 3500" min="1">
+          </div>
+          <div class="calc-field">
+            <label>PPP da base (pkgs / shuttle)</label>
+            <input type="number" id="calcPPP" placeholder="ex: 220" min="1">
+          </div>
+        </div>
         <button class="btn-calc" onclick="openCalcModal()">Calcular opções</button>
       </div>
     </div>
 
     <!-- ── Glossário de Veículos ── -->
     <div class="glossary-card">
-      <h2>📋 Tipos de Veículo</h2>
+      <h2>Referência — Tipos de Veículo</h2>
       <table>
         <thead>
-          <tr><th>Truck Type</th><th>Modelo</th><th>Shuttles</th></tr>
+          <tr><th>Truck Type (AWS)</th><th>Modelo</th><th>Shuttles</th></tr>
         </thead>
         <tbody>
-          <tr><td>FORTY FOOT TRUCK</td><td>VUC</td><td><span class="badge-sh">6</span></td></tr>
-          <tr><td>FOURTEEN FOOT VAN</td><td>3/4</td><td><span class="badge-sh">8</span></td></tr>
-          <tr><td>TWENTY FOOT BOX TRUCK</td><td>Toco</td><td><span class="badge-sh">12</span></td></tr>
-          <tr><td>TWENTY SIX FOOT BOX TRUCK</td><td>Truck</td><td><span class="badge-sh">16</span></td></tr>
-          <tr><td>FORTY EIGHT FOOT TRUCK</td><td>Carreta</td><td><span class="badge-sh">28</span></td></tr>
-          <tr><td>SEVEN FOOT VAN</td><td>Fiorino</td><td><span class="badge-sh">2</span></td></tr>
+          <tr><td>SEVEN FOOT VAN</td><td>Fiorino</td><td><span class="badge-sh sh-xs">2</span></td></tr>
+          <tr><td>FORTY FOOT TRUCK</td><td>VUC</td><td><span class="badge-sh sh-xs">6</span></td></tr>
+          <tr><td>FOURTEEN FOOT VAN</td><td>3/4</td><td><span class="badge-sh sh-sm">8</span></td></tr>
+          <tr><td>TWENTY FOOT BOX TRUCK</td><td>Toco</td><td><span class="badge-sh sh-md">12</span></td></tr>
+          <tr><td>TWENTY SIX FOOT BOX TRUCK</td><td>Truck</td><td><span class="badge-sh sh-lg">16</span></td></tr>
+          <tr><td>FORTY EIGHT FOOT TRUCK</td><td>Carreta</td><td><span class="badge-sh sh-xl">28</span></td></tr>
         </tbody>
       </table>
     </div>
