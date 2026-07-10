@@ -422,37 +422,50 @@ function plannedCap(str) {
     const [q,t]=p.split('×'); return s+(parseInt(q)||0)*(CAP_SH[t.trim()]||10);
   }, 0);
 }
-// Tiers de veículo considerados no planejado (Carreta→Truck→Toco→3/4)
+// Tiers considerados no planejado: Carreta(28) → Truck(16) → Toco(12) → 3/4(8)
 const PLAN_TIERS = [28, 16, 12, 8];
 
-// Retorna a menor capacidade possível após rebaixar 1 veículo por um tier
-function minDowngrade(shPlan) {
-  let best = shPlan; // pior caso: não consegue rebaixar nada
-  for (const cap of PLAN_TIERS) {
-    if (shPlan >= cap) {
-      const idx = PLAN_TIERS.indexOf(cap);
-      // Tentar substituir um veículo desse tier pelo tier inferior
-      const nextCap = idx < PLAN_TIERS.length - 1 ? PLAN_TIERS[idx + 1] : 0;
-      const reduced = shPlan - cap + nextCap; // substitui por menor (ou remove)
-      if (reduced < best) best = reduced;
+// Verifica se a configuração planejada é a mínima viável:
+// testa substituir/remover cada veículo por um tier inferior —
+// se NENHUMA troca conseguir manter cobertura total, o plano é mínimo → OK
+function isMinViable(needInt, plannedStr) {
+  if (!plannedStr || plannedStr === '-') return false;
+  // Parsear veículos planejados: "2×Carreta, 1×Toco" → [{type,qty,cap}]
+  const veh = [];
+  for (const part of plannedStr.split(', ')) {
+    if (!part.includes('×')) continue;
+    const [q, t] = part.split('×');
+    const cap = CAP_SH[t.trim()];
+    if (cap && PLAN_TIERS.includes(cap)) veh.push({type: t.trim(), qty: parseInt(q), cap});
+  }
+  if (!veh.length) return false;
+  const totalCap = veh.reduce((s, v) => s + v.qty * v.cap, 0);
+  // Para cada tipo de veículo, tentar rebaixar 1 unidade
+  for (const v of veh) {
+    const idx = PLAN_TIERS.indexOf(v.cap);
+    // Tentar remover 1 veículo deste tipo
+    const afterRemove = totalCap - v.cap;
+    if (afterRemove >= needInt) return false; // ainda cobre → NÃO é mínimo viável
+    // Tentar substituir 1 veículo deste tipo pelo tier imediatamente inferior
+    if (idx < PLAN_TIERS.length - 1) {
+      const afterReplace = totalCap - v.cap + PLAN_TIERS[idx + 1];
+      if (afterReplace >= needInt) return false; // substituto cobre → NÃO é mínimo viável
     }
   }
-  return best;
+  return true; // nenhuma troca possível → mínimo viável → OK
 }
 
-function matchStatus(shNeed, shPlan) {
-  if (shNeed<=0) return 'nd';
-  if (shPlan===0) return 'under';
-  const r=shPlan/shNeed;
-  if (r>1.1) {
-    // Excesso: verificar se é a configuração mínima viável
-    // (rebaixar qualquer veículo por um tier já tornaria insuficiente)
-    const afterDowngrade = minDowngrade(shPlan);
-    if (afterDowngrade < shNeed * 0.9) return 'ok'; // mínimo viável → OK
+function matchStatus(shNeed, shPlan, plannedStr) {
+  const need = Math.ceil(shNeed); // requisito físico (shuttles inteiros)
+  if (need <= 0) return 'nd';
+  if (shPlan === 0) return 'under';
+  const r = shPlan / need;
+  if (r > 1.1) {
+    if (isMinViable(need, plannedStr || '')) return 'ok';
     return 'excess';
   }
-  if (r>=0.9) return 'ok';
-  if (r>=0.7) return 'low';
+  if (r >= 0.9) return 'ok';
+  if (r >= 0.7) return 'low';
   return 'under';
 }
 const BADGE = {
@@ -486,7 +499,7 @@ function renderAll(laneData, source='default') {
       const rows = (laneData[lane]||{})[wk]||[];
       for (const d of rows) {
         const shp = plannedCap(d.planned);
-        const m = matchStatus(d.shuttles||0, shp);
+        const m = matchStatus(d.shuttles||0, shp, d.planned);
         counts[wk][m]++;
       }
     }
@@ -536,7 +549,7 @@ function renderAll(laneData, source='default') {
         }
         const o1 = opt1(sh), o2 = opt2(sh);
         const shp = plannedCap(d.planned);
-        const m = matchStatus(sh, shp);
+        const m = matchStatus(sh, shp, d.planned);
         const rc = `row-${m}`;
         const o1h = o1!=='N/A'?`<span class="rec op1">${o1}</span>`:'<span class="na">N/A</span>';
         const o2h = o2!=='N/A'?`<span class="rec op2">${o2}</span>`:'<span class="na">N/A</span>';
@@ -712,7 +725,7 @@ function generateFromFiles() {
           const dd=ds.slice(8,10), mm=ds.slice(5,7);
           const sh = vol ? Math.ceil(vol / (PPP[node]||1)) : 0;
           const shPlan = plannedCap(pStr);
-          return {date:`${dd}/${mm}`,vol,shuttles:sh,sh_plan:shPlan,planned:pStr,match:matchStatus(sh,shPlan)};
+          return {date:`${dd}/${mm}`,vol,shuttles:sh,sh_plan:shPlan,planned:pStr,match:matchStatus(sh,shPlan,pStr)};
         });
       }
     }
