@@ -476,10 +476,10 @@ function renderAll(laneData, source='default') {
   for (const lane of DF_SUL_LANES) {
     const node = lane.split('->')[0];
     const color = NODE_COLOR[node]||'#374151';
-    const laneTag = lane === 'ECB8->CGH7' ? ' <span style="background:rgba(55,65,81,.5);border:1px solid rgba(124,58,237,.4);color:#a78bfa;font-size:9px;border-radius:4px;padding:1px 5px;font-weight:600;letter-spacing:.5px;vertical-align:middle">⊕ EGO8 incluso</span>' : '';
+    const laneTag = lane === 'ESB8->EGO8' ? ' <span style="background:rgba(55,65,81,.5);border:1px solid rgba(124,58,237,.4);color:#a78bfa;font-size:9px;border-radius:4px;padding:1px 5px;font-weight:600;letter-spacing:.5px;vertical-align:middle">⊕ EGO8 incluso</span>' : '';
     const hasData = DF_SUL_LANES.includes(lane) && (laneData[lane]?.WK28||[]).some(d=>d.vol);
     let note = hasData ? '' : `<div class="no-data-bar">⚠ ${node} não presente na Máscara WK28-30 — forecast indisponível</div>`;
-    if (node === 'EGO8') note += `<div class="no-data-bar" style="background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.3)">⊕ Carga consolidada no veículo ECB8→EGO8 — o veículo que sai de ECB8 para em EGO8 para completar a carga</div>`;
+    if (node === 'EGO8') note += `<div class="no-data-bar" style="background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.3)">⊕ Carga consolidada no veículo ESB8→EGO8 — o veículo que sai de ESB8 para em EGO8 para completar a carga</div>`;
     let tables = '';
     for (const [wk, dates] of Object.entries(WKS)) {
       const rows = (laneData[lane]||{})[wk]||[];
@@ -487,13 +487,13 @@ function renderAll(laneData, source='default') {
       for (const d of rows) {
         let sh = d.shuttles||0;
         let shBreakdown = '';
-        // ECB8->CGH7: mesmo veículo carrega ECB8 + EGO8 (para em EGO8 e completa a carga)
-        if (lane === 'ECB8->CGH7') {
+        // ESB8->EGO8: mesmo veículo carrega ESB8 + EGO8 (para em EGO8 e completa a carga)
+        if (lane === 'ESB8->EGO8') {
           const ego8rows = (laneData['EGO8->EUB8']||{})[wk]||[];
           const ego8d = ego8rows.find(r => r.date === d.date);
           const shEgo8 = ego8d ? (ego8d.shuttles||0) : 0;
           if (shEgo8 > 0) {
-            shBreakdown = `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">ECB8: ${(d.shuttles||0).toFixed(1)} + EGO8: ${shEgo8.toFixed(1)}</div>`;
+            shBreakdown = `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">ESB8: ${(d.shuttles||0).toFixed(1)} + EGO8: ${shEgo8.toFixed(1)}</div>`;
             sh = parseFloat(((d.shuttles||0) + shEgo8).toFixed(1));
           }
         }
