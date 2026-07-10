@@ -211,6 +211,99 @@
   .calc-opt-block .total-row td{font-weight:700;color:var(--amz-orange);border-top:1px solid var(--border);padding-top:6px}
   .btn-close-calc{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1}
   .btn-close-calc:hover{color:var(--amz-orange)}
+
+  /* ─ Tabs ─ */
+  .tab-nav{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;background:var(--card);border-radius:10px 10px 0 0;overflow:hidden}
+  .tab-btn{flex:0 0 auto;padding:11px 22px;background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:.4px;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:7px}
+  .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
+  .tab-btn.active{color:var(--amz-orange);border-bottom-color:var(--amz-orange);background:rgba(255,153,0,.06)}
+  .req-badge{background:var(--amz-orange);color:#000;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:800;line-height:1.6}
+  /* ─ Revisão ─ */
+  .rev-panel{animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .rev-filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+  .rev-filters label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-right:4px}
+  .rev-filters select,.rev-filters input[type=text]{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text);outline:none;min-width:130px;transition:border-color .15s}
+  .rev-filters select:focus,.rev-filters input:focus{border-color:var(--amz-orange)}
+  .rev-filters .sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+  .rev-actions{display:flex;gap:8px;margin-left:auto}
+  .btn-rev{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);letter-spacing:.3px;transition:all .15s}
+  .btn-rev.export{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.3)}
+  .btn-rev.export:hover{background:rgba(59,130,246,.25)}
+  .btn-rev.email{background:rgba(255,153,0,.15);color:var(--amz-orange);border-color:rgba(255,153,0,.3)}
+  .btn-rev.email:hover{background:rgba(255,153,0,.25)}
+  .btn-rev.clear{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.25)}
+  .btn-rev.clear:hover{background:rgba(239,68,68,.2)}
+  .rev-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .rev-table{width:100%;border-collapse:collapse;font-size:12px}
+  .rev-table thead tr{background:var(--bg)}
+  .rev-table th{padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+  .rev-table th:first-child{width:36px;text-align:center}
+  .rev-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text);vertical-align:middle}
+  .rev-table tr:last-child td{border-bottom:none}
+  .rev-table tr:hover td{background:rgba(255,255,255,.02)}
+  .rev-table tr.selected td{background:rgba(255,153,0,.06)}
+  .rev-table input[type=checkbox]{width:14px;height:14px;accent-color:var(--amz-orange);cursor:pointer}
+  .rev-table .node-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;color:#fff}
+  .pill-pending{background:#92400E;color:#fde68a}
+  .pill-approved{background:#064e3b;color:#6ee7b7}
+  .pill-rejected{background:#450a0a;color:#fca5a5}
+  .rev-empty{padding:48px 24px;text-align:center;color:var(--text-muted);font-size:13px}
+  .rev-empty svg{width:40px;height:40px;margin-bottom:12px;opacity:.3}
+  .rev-sel-count{font-size:11px;color:var(--text-muted);padding:4px 0}
+  /* ─ Request Modal ─ */
+  #reqOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2100;align-items:center;justify-content:center}
+  #reqOverlay.open{display:flex}
+  #reqModal{background:var(--card);border-radius:14px;padding:0;width:min(600px,96vw);max-height:90vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.6);border:1px solid var(--border)}
+  .req-modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .req-modal-head h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin:0}
+  .req-modal-head .btn-close-req{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;padding:0 4px}
+  .req-modal-head .btn-close-req:hover{color:var(--amz-orange)}
+  .req-modal-body{padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+  .req-field{display:flex;flex-direction:column;gap:5px}
+  .req-field.full{grid-column:1/-1}
+  .req-field label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px}
+  .req-field .ro{font-size:13px;color:var(--text);font-weight:600;padding:7px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+  .req-field textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);resize:vertical;min-height:72px;outline:none;font-family:inherit;transition:border-color .15s}
+  .req-field textarea:focus{border-color:var(--amz-orange)}
+  /* Vehicle builder */
+  .veh-builder{display:flex;flex-direction:column;gap:6px}
+  .veh-row{display:flex;gap:6px;align-items:center}
+  .veh-row select,.veh-row input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:12px;outline:none;transition:border-color .15s}
+  .veh-row select:focus,.veh-row input:focus{border-color:var(--amz-orange)}
+  .veh-row select{flex:1}
+  .veh-row input{width:60px;text-align:center}
+  .veh-row .btn-rm{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);color:#fca5a5;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:12px;line-height:1}
+  .btn-add-veh{align-self:flex-start;background:rgba(255,153,0,.1);border:1px dashed rgba(255,153,0,.4);color:var(--amz-orange);border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:600;transition:all .15s;margin-top:4px}
+  .btn-add-veh:hover{background:rgba(255,153,0,.2)}
+  .veh-preview{margin-top:8px;padding:8px 12px;border-radius:7px;font-size:11px;display:flex;gap:12px;align-items:center}
+  .veh-preview.ok{background:rgba(6,78,58,.3);border:1px solid rgba(110,231,183,.2);color:#6ee7b7}
+  .veh-preview.low{background:rgba(146,64,14,.25);border:1px solid rgba(253,230,138,.2);color:#fde68a}
+  .veh-preview.under{background:rgba(69,10,10,.3);border:1px solid rgba(252,165,165,.2);color:#fca5a5}
+  .veh-preview b{font-size:13px;font-weight:800}
+  .req-modal-foot{padding:14px 24px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+  .btn-req-save{background:var(--amz-orange);color:#000;border:none;border-radius:8px;padding:9px 22px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;transition:background .15s}
+  .btn-req-save:hover{background:#e8960f}
+  .btn-req-cancel{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:9px 16px;font-size:12px;cursor:pointer;transition:all .15s}
+  .btn-req-cancel:hover{border-color:var(--text-muted);color:var(--text)}
+  /* ─ "✏" button in rows ─ */
+  .btn-req-row{background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);border-radius:5px;padding:2px 7px;cursor:pointer;font-size:11px;transition:all .15s;line-height:1.4}
+  .btn-req-row:hover{border-color:var(--amz-orange);color:var(--amz-orange);background:rgba(255,153,0,.1)}
+  /* ─ Email Modal ─ */
+  #emailOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2200;align-items:center;justify-content:center}
+  #emailOverlay.open{display:flex}
+  #emailModal{background:var(--card);border-radius:14px;padding:0;width:min(640px,96vw);max-height:88vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.6);border:1px solid var(--border)}
+  .email-head{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .email-head h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin:0}
+  .email-body{padding:20px 24px}
+  .email-field{margin-bottom:14px}
+  .email-field label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
+  .email-field textarea,.email-field input{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--text);outline:none;font-family:monospace;transition:border-color .15s}
+  .email-field textarea{min-height:220px;resize:vertical}
+  .email-field textarea:focus,.email-field input:focus{border-color:var(--amz-orange)}
+  .email-foot{padding:12px 24px 16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+  .btn-copy{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.3);border-radius:7px;padding:7px 16px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+  .btn-copy:hover{background:rgba(59,130,246,.28)}
 </style>
 </head>
 <body>
@@ -280,6 +373,55 @@
   </div>
   <button class="btn-generate" id="btnGen" onclick="generateFromFiles()" disabled>▶ Gerar Relatório</button>
   <div class="upload-status" id="uploadStatus">Aguardando os dois arquivos para habilitar a geração.</div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-nav">
+  <button class="tab-btn active" id="tabBtnRelatorio" onclick="showTab('relatorio')">
+    <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zm0 6a1 1 0 011-1h6a1 1 0 010 2H4a1 1 0 01-1-1z"/></svg>
+    Relatório
+  </button>
+  <button class="tab-btn" id="tabBtnRevisao" onclick="showTab('revisao')">
+    <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+    Revisão de Solicitações
+    <span class="req-badge" id="reqBadge" style="display:none">0</span>
+  </button>
+</div>
+
+<!-- Revisão Panel -->
+<div id="tabRevisao" class="rev-panel" style="display:none">
+  <div class="rev-filters">
+    <label>Regional</label>
+    <select id="filtRegional" onchange="renderRevisao()">
+      <option value="">Todos</option>
+    </select>
+    <label style="margin-left:8px">Node</label>
+    <select id="filtNode" onchange="renderRevisao()">
+      <option value="">Todos</option>
+    </select>
+    <div class="sep"></div>
+    <label>Status</label>
+    <select id="filtStatus" onchange="renderRevisao()">
+      <option value="">Todos</option>
+      <option value="pending">Pendente</option>
+      <option value="approved">Aprovado</option>
+      <option value="rejected">Rejeitado</option>
+    </select>
+    <div class="sep"></div>
+    <span class="rev-sel-count" id="selCount">0 selecionados</span>
+    <div class="rev-actions">
+      <button class="btn-rev email" onclick="buildEmail()">📧 Montar E-mail</button>
+      <button class="btn-rev export" onclick="exportExcel()">⬇ Exportar Excel</button>
+      <button class="btn-rev clear" onclick="clearRequests()">🗑 Limpar tudo</button>
+    </div>
+  </div>
+  <div class="rev-table-wrap" id="revTableWrap">
+    <div class="rev-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <div>Nenhuma solicitação registrada ainda.</div>
+      <div style="font-size:11px;margin-top:4px">Use o botão <b>✏</b> em qualquer linha do relatório para criar uma.</div>
+    </div>
+  </div>
 </div>
 
 <!-- Report -->
@@ -556,10 +698,10 @@ function renderAll(laneData, source='default') {
         const ph = d.planned&&d.planned!=='-'?`<code>${d.planned}</code>`:'<span class="na">—</span>';
         const sh_fmt = sh?`<b>${sh}</b>${shBreakdown}`:'<span class="na">—</span>';
         const vl = fmtVol(d.vol);
-        tbody += `<tr class="${rc}"><td class="dc">${d.date}</td><td class="vc">${vl}</td><td class="sc">${sh_fmt}</td><td>${o1h}</td><td>${o2h}</td><td>${ph}</td><td>${BADGE[m]}</td></tr>`;
+        tbody += `<tr class="${rc}"><td class="dc">${d.date}</td><td class="vc">${vl}</td><td class="sc">${sh_fmt}</td><td>${o1h}</td><td>${o2h}</td><td>${ph}</td><td>${BADGE[m]}</td><td><button class="btn-req-row" data-lane="${lane}" data-date="${d.date}" data-wk="${wk}" data-sh="${sh}" data-plan="${(d.planned||'-').replace(/"/g,'&quot;')}" onclick="openReqModalFromBtn(this)" title="Solicitar alteração">✏</button></td></tr>`;
       }
       tables += `<div class="wk-block"><div class="wk-label">${wk}</div>
-        <table><thead><tr><th>Data</th><th>Forecast<br><small>pct</small></th><th>Shuttles<br><small>nec.</small></th><th>Opção 1<br><small>Carreta+</small></th><th>Opção 2<br><small>Truck+</small></th><th>Planejado<br><small>TP</small></th><th>Status</th></tr></thead>
+        <table><thead><tr><th>Data</th><th>Forecast<br><small>pct</small></th><th>Shuttles<br><small>nec.</small></th><th>Opção 1<br><small>Carreta+</small></th><th>Opção 2<br><small>Truck+</small></th><th>Planejado<br><small>TP</small></th><th>Status</th><th style="width:42px"></th></tr></thead>
         <tbody>${tbody}</tbody></table></div>`;
     }
     cardsHtml += `<div class="lane-card" data-lane="${lane}">
@@ -889,6 +1031,305 @@ function closeCalcModal() {
   document.getElementById('calcOverlay').classList.remove('open');
 }
 
+// ══════════════════════════════════════════════════════════════
+// ALTERAR PLANNING — SISTEMA DE SOLICITAÇÕES
+// ══════════════════════════════════════════════════════════════
+const REGIONAL = {
+  ECB8:'Regional ECB8', EJO8:'Regional ECB8',
+  EGO8:'Regional EGO8', ESB8:'Regional EGO8',
+  ELO8:'Regional ELO8', EMR8:'Regional ELO8', EVE8:'Regional ELO8',
+  ERS8:'Regional ERS8', EXS9:'Regional ERS8',
+  ESE8:'Regional ESE8', EIJ8:'Regional ESE8', EME8:'Regional ESE8', EUM8:'Regional ESE8'
+};
+
+const VEH_TYPES = [
+  {label:'Carreta (28 sh)', value:'Carreta', cap:28},
+  {label:'Truck (16 sh)',   value:'Truck',   cap:16},
+  {label:'Toco (12 sh)',    value:'Toco',    cap:12},
+  {label:'3/4 (8 sh)',      value:'3/4',     cap:8},
+  {label:'VUC (6 sh)',      value:'VUC',     cap:6},
+];
+
+// Persistência em localStorage
+function loadRequests() {
+  try { return JSON.parse(localStorage.getItem('tp_requests')||'[]'); } catch{ return []; }
+}
+function saveRequests(reqs) {
+  localStorage.setItem('tp_requests', JSON.stringify(reqs));
+  updateBadge();
+}
+function updateBadge() {
+  const n = loadRequests().length;
+  const badge = document.getElementById('reqBadge');
+  if (badge) { badge.textContent = n; badge.style.display = n ? 'inline-block' : 'none'; }
+}
+
+// ─ Tabs ─
+function showTab(tab) {
+  const relatorio = document.getElementById('reportWrap');
+  const revisao   = document.getElementById('tabRevisao');
+  const btnRel    = document.getElementById('tabBtnRelatorio');
+  const btnRev    = document.getElementById('tabBtnRevisao');
+  if (tab === 'relatorio') {
+    relatorio.style.display = ''; revisao.style.display = 'none';
+    btnRel.classList.add('active'); btnRev.classList.remove('active');
+  } else {
+    relatorio.style.display = 'none'; revisao.style.display = 'block';
+    btnRev.classList.add('active'); btnRel.classList.remove('active');
+    renderRevisao();
+  }
+}
+
+// ─ Filtros da Revisão ─
+function populateFilters() {
+  const reqs = loadRequests();
+  const regionals = [...new Set(reqs.map(r => r.regional))].sort();
+  const nodes     = [...new Set(reqs.map(r => r.node))].sort();
+  const selReg = document.getElementById('filtRegional');
+  const selNode = document.getElementById('filtNode');
+  const prevReg = selReg.value, prevNode = selNode.value;
+  selReg.innerHTML  = '<option value="">Todos regionais</option>' + regionals.map(r=>`<option value="${r}">${r}</option>`).join('');
+  selNode.innerHTML = '<option value="">Todos nodes</option>'     + nodes.map(n=>`<option value="${n}">${n}</option>`).join('');
+  if (prevReg  && regionals.includes(prevReg))  selReg.value  = prevReg;
+  if (prevNode && nodes.includes(prevNode))     selNode.value = prevNode;
+}
+
+// ─ Renderizar tabela de revisão ─
+function renderRevisao() {
+  populateFilters();
+  let reqs = loadRequests();
+  const filtReg    = document.getElementById('filtRegional')?.value || '';
+  const filtNode   = document.getElementById('filtNode')?.value     || '';
+  const filtStatus = document.getElementById('filtStatus')?.value   || '';
+  if (filtReg)    reqs = reqs.filter(r => r.regional === filtReg);
+  if (filtNode)   reqs = reqs.filter(r => r.node === filtNode);
+  if (filtStatus) reqs = reqs.filter(r => r.status === filtStatus);
+  const wrap = document.getElementById('revTableWrap');
+  if (!reqs.length) {
+    wrap.innerHTML = '<div class="rev-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><div>Nenhuma solicitação encontrada.</div></div>';
+    document.getElementById('selCount').textContent = '0 selecionados';
+    return;
+  }
+  const STATUS_LABEL = {pending:'Pendente', approved:'Aprovado', rejected:'Rejeitado'};
+  const STATUS_CLASS = {pending:'pill-pending', approved:'pill-approved', rejected:'pill-rejected'};
+  const rows = reqs.map(r => `
+    <tr data-id="${r.id}">
+      <td style="text-align:center"><input type="checkbox" class="req-chk" data-id="${r.id}" onchange="updateSelCount()"></td>
+      <td><span class="node-pill" style="background:${getNodeColor(r.node)}">${r.node}</span></td>
+      <td style="color:var(--text-muted);font-size:11px">${r.regional}</td>
+      <td>${r.lane}</td>
+      <td>${r.date} <span style="color:var(--text-muted);font-size:10px">${r.wk}</span></td>
+      <td style="text-align:center">${r.shNeed}</td>
+      <td><code style="font-size:11px">${r.currentPlan}</code></td>
+      <td><code style="font-size:11px;color:var(--amz-orange)">${r.proposed}</code></td>
+      <td style="max-width:180px;font-size:11px;color:var(--text-muted)">${r.justification||'—'}</td>
+      <td><span class="${STATUS_CLASS[r.status]||'pill-pending'}" style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">${STATUS_LABEL[r.status]||'Pendente'}</span></td>
+      <td style="white-space:nowrap">
+        <button style="background:rgba(110,231,183,.1);border:1px solid rgba(110,231,183,.25);color:#6ee7b7;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700" onclick="setStatus('${r.id}','approved')">✓</button>
+        <button style="background:rgba(252,165,165,.1);border:1px solid rgba(252,165,165,.25);color:#fca5a5;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700;margin-left:3px" onclick="setStatus('${r.id}','rejected')">✗</button>
+        <button style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;margin-left:3px" onclick="deleteRequest('${r.id}')">🗑</button>
+      </td>
+    </tr>`).join('');
+  wrap.innerHTML = `
+    <table class="rev-table">
+      <thead><tr>
+        <th><input type="checkbox" style="width:14px;height:14px;accent-color:var(--amz-orange);cursor:pointer" onchange="toggleAll(this)"></th>
+        <th>Node</th><th>Regional</th><th>Lane</th><th>Data</th>
+        <th>Sh nec.</th><th>Plano atual</th><th>Plano proposto</th>
+        <th>Justificativa</th><th>Status</th><th>Ações</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  updateSelCount();
+}
+
+function getNodeColor(node) {
+  return NODE_COLOR[node] || '#374151';
+}
+
+function toggleAll(el) {
+  document.querySelectorAll('.req-chk').forEach(c => c.checked = el.checked);
+  updateSelCount();
+}
+function updateSelCount() {
+  const n = document.querySelectorAll('.req-chk:checked').length;
+  document.getElementById('selCount').textContent = n + ' selecionado' + (n!==1?'s':'');
+}
+function setStatus(id, status) {
+  const reqs = loadRequests();
+  const r = reqs.find(r => r.id === id);
+  if (r) { r.status = status; saveRequests(reqs); renderRevisao(); }
+}
+function deleteRequest(id) {
+  if (!confirm('Remover esta solicitação?')) return;
+  saveRequests(loadRequests().filter(r => r.id !== id));
+  renderRevisao();
+}
+function clearRequests() {
+  if (!confirm('Remover TODAS as solicitações? Esta ação não pode ser desfeita.')) return;
+  saveRequests([]); renderRevisao();
+}
+
+// ─ Modal de Solicitação ─
+let _reqState = {};
+
+function openReqModalFromBtn(btn) {
+  const d = btn.dataset;
+  openReqModal(d.lane, d.date, d.wk, parseFloat(d.sh), d.plan);
+}
+
+function openReqModal(lane, date, wk, shNeed, currentPlan) {
+  const node = lane.split('->')[0];
+  _reqState = {lane, date, wk, shNeed, node, currentPlan: currentPlan || '-', regional: REGIONAL[node]||node};
+  document.getElementById('rqNode').textContent     = node;
+  document.getElementById('rqRegional').textContent = _reqState.regional;
+  document.getElementById('rqLane').textContent     = lane;
+  document.getElementById('rqDateWk').textContent   = date + ' — ' + wk;
+  document.getElementById('rqSh').textContent       = shNeed + ' shuttles';
+  document.getElementById('rqCurrent').textContent  = currentPlan || '—';
+  document.getElementById('rqJustification').value  = '';
+  // Pré-preencher builder com opt1 desta quantidade
+  const builder = document.getElementById('vehBuilder');
+  builder.innerHTML = '';
+  const suggested = opt1(shNeed);
+  if (suggested && suggested !== 'N/A') {
+    for (const part of suggested.split(', ')) {
+      if (part.includes('×')) {
+        const [q, t] = part.split('×');
+        addVehRow(t.trim(), parseInt(q));
+      }
+    }
+  } else { addVehRow(); }
+  updateVehPreview();
+  document.getElementById('reqOverlay').classList.add('open');
+}
+function closeReqModal() {
+  document.getElementById('reqOverlay').classList.remove('open');
+}
+
+function addVehRow(type='Carreta', qty=1) {
+  const builder = document.getElementById('vehBuilder');
+  const row = document.createElement('div');
+  row.className = 'veh-row';
+  row.innerHTML = `
+    <select onchange="updateVehPreview()">
+      ${VEH_TYPES.map(v=>`<option value="${v.value}" ${v.value===type?'selected':''}>${v.label}</option>`).join('')}
+    </select>
+    <input type="number" value="${qty}" min="1" max="20" onchange="updateVehPreview()" oninput="updateVehPreview()">
+    <button class="btn-rm" onclick="this.closest('.veh-row').remove();updateVehPreview()">−</button>`;
+  builder.appendChild(row);
+  updateVehPreview();
+}
+
+function getProposedStr() {
+  const rows = document.querySelectorAll('#vehBuilder .veh-row');
+  const parts = [];
+  rows.forEach(row => {
+    const type = row.querySelector('select').value;
+    const qty  = parseInt(row.querySelector('input').value) || 1;
+    if (qty > 0) parts.push(qty + '×' + type);
+  });
+  return parts.join(', ') || '-';
+}
+
+function updateVehPreview() {
+  const str = getProposedStr();
+  const totalSh = str.split(', ').reduce((s,p) => {
+    if (!p.includes('×')) return s;
+    const [q,t] = p.split('×');
+    const v = VEH_TYPES.find(v=>v.value===t.trim());
+    return s + (parseInt(q)||0) * (v?v.cap:0);
+  }, 0);
+  const shNeed = _reqState.shNeed || 0;
+  const need = Math.ceil(shNeed);
+  const pct = need > 0 ? Math.round(totalSh/need*100) : 0;
+  const cls = totalSh >= need ? (pct > 130 ? 'low' : 'ok') : 'under';
+  const icon = cls==='ok'?'✓':cls==='low'?'⚠':'✗';
+  document.getElementById('vehPreview').className = 'veh-preview ' + cls;
+  document.getElementById('vehPreview').innerHTML =
+    `${icon} <b>${totalSh} sh</b> para ${need} necessários — <b>${pct}%</b> de cobertura &nbsp;·&nbsp; ${str}`;
+}
+
+function saveRequest() {
+  const proposed = getProposedStr();
+  if (proposed === '-') { alert('Adicione ao menos um veículo ao plano proposto.'); return; }
+  const just = document.getElementById('rqJustification').value.trim();
+  const req = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    ..._reqState,
+    proposed,
+    justification: just,
+    status: 'pending',
+    createdAt: new Date().toLocaleString('pt-BR')
+  };
+  const reqs = loadRequests();
+  reqs.push(req);
+  saveRequests(reqs);
+  closeReqModal();
+  // Feedback visual
+  const badge = document.getElementById('reqBadge');
+  if (badge) { badge.style.transform='scale(1.4)'; setTimeout(()=>badge.style.transform='',300); }
+}
+
+// ─ Export Excel ─
+function exportExcel() {
+  const reqs = loadRequests();
+  if (!reqs.length) { alert('Nenhuma solicitação para exportar.'); return; }
+  const STATUS_LABEL = {pending:'Pendente', approved:'Aprovado', rejected:'Rejeitado'};
+  const headers = ['Regional','Node','Lane','Semana','Data','Sh Necessário','Plano Atual','Plano Proposto','Justificativa','Status','Data/Hora Solicitação'];
+  const rows = reqs.map(r => [
+    r.regional, r.node, r.lane, r.wk, r.date,
+    r.shNeed, r.currentPlan, r.proposed,
+    r.justification||'', STATUS_LABEL[r.status]||'Pendente', r.createdAt
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  // Estilo de largura de colunas
+  ws['!cols'] = [16,8,18,6,6,10,20,20,30,10,18].map(w=>({wch:w}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
+  XLSX.writeFile(wb, 'truck_planning_solicitacoes.xlsx');
+}
+
+// ─ Montar E-mail ─
+function buildEmail() {
+  const checked = [...document.querySelectorAll('.req-chk:checked')];
+  if (!checked.length) { alert('Selecione ao menos uma solicitação.'); return; }
+  const ids = checked.map(c => c.dataset.id);
+  const allReqs = loadRequests();
+  const selected = ids.map(id => allReqs.find(r => r.id === id)).filter(Boolean);
+  const lines = selected.map(r =>
+    `• ${r.node} | ${r.date} (${r.wk})\n  Plano atual:    ${r.currentPlan}\n  Plano proposto: ${r.proposed}${r.justification ? '\n  Justificativa:  ' + r.justification : ''}`
+  ).join('\n\n');
+  const body = `Olá,\n\nSolicitamos as seguintes alterações no Truck Planning DF-SUL:\n\n${lines}\n\nPor favor, avaliar e confirmar as alterações acima.\n\nAtenciosamente,\nEquipe DF-SUL`;
+  document.getElementById('emailTo').value      = '';
+  document.getElementById('emailSubject').value = 'Solicitação de Alteração — Truck Planning DF-SUL';
+  document.getElementById('emailBody').value    = body;
+  document.getElementById('emailOverlay').classList.add('open');
+}
+function closeEmailModal() { document.getElementById('emailOverlay').classList.remove('open'); }
+function copyEmail() {
+  const to   = document.getElementById('emailTo').value;
+  const subj = document.getElementById('emailSubject').value;
+  const body = document.getElementById('emailBody').value;
+  const full = (to ? 'Para: ' + to + '\n' : '') + 'Assunto: ' + subj + '\n\n' + body;
+  navigator.clipboard.writeText(full).then(() => {
+    const btn = document.querySelector('#emailModal .btn-copy');
+    btn.textContent = '✓ Copiado!'; setTimeout(()=>btn.textContent='📋 Copiar tudo',2000);
+  });
+}
+function openMailto() {
+  const to   = encodeURIComponent(document.getElementById('emailTo').value);
+  const subj = encodeURIComponent(document.getElementById('emailSubject').value);
+  const body = encodeURIComponent(document.getElementById('emailBody').value);
+  window.location.href = `mailto:${to}?subject=${subj}&body=${body}`;
+}
+
+document.getElementById('reqOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeReqModal(); });
+document.getElementById('emailOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeEmailModal(); });
+
+// Inicializar badge ao carregar
+updateBadge();
+
 document.getElementById('calcOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeCalcModal();
 });
@@ -902,6 +1343,85 @@ document.getElementById('calcOverlay').addEventListener('click', function(e) {
     <h3>Resultado — Truck Planning</h3>
     <div class="calc-info" id="calcInfo"></div>
     <div id="calcResults"></div>
+  </div>
+</div>
+
+<!-- ── Request Modal ── -->
+<div id="reqOverlay">
+  <div id="reqModal">
+    <div class="req-modal-head">
+      <h3>✏ Solicitar Alteração de Planning</h3>
+      <button class="btn-close-req" onclick="closeReqModal()">✕</button>
+    </div>
+    <div class="req-modal-body">
+      <div class="req-field">
+        <label>Node</label>
+        <div class="ro" id="rqNode">—</div>
+      </div>
+      <div class="req-field">
+        <label>Regional</label>
+        <div class="ro" id="rqRegional">—</div>
+      </div>
+      <div class="req-field">
+        <label>Lane</label>
+        <div class="ro" id="rqLane">—</div>
+      </div>
+      <div class="req-field">
+        <label>Data / Semana</label>
+        <div class="ro" id="rqDateWk">—</div>
+      </div>
+      <div class="req-field">
+        <label>Shuttles necessários</label>
+        <div class="ro" id="rqSh">—</div>
+      </div>
+      <div class="req-field">
+        <label>Plano atual</label>
+        <div class="ro" id="rqCurrent">—</div>
+      </div>
+      <div class="req-field full">
+        <label>Plano proposto — construtor de veículos</label>
+        <div class="veh-builder" id="vehBuilder"></div>
+        <button class="btn-add-veh" onclick="addVehRow()">+ Adicionar veículo</button>
+        <div class="veh-preview under" id="vehPreview">Adicione ao menos um veículo</div>
+      </div>
+      <div class="req-field full">
+        <label>Justificativa</label>
+        <textarea id="rqJustification" placeholder="Ex.: Forecast revisado, veículo disponível, redução de custo..."></textarea>
+      </div>
+    </div>
+    <div class="req-modal-foot">
+      <button class="btn-req-cancel" onclick="closeReqModal()">Cancelar</button>
+      <button class="btn-req-save" onclick="saveRequest()">Salvar solicitação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Email Modal ── -->
+<div id="emailOverlay">
+  <div id="emailModal">
+    <div class="email-head">
+      <h3>📧 Montar E-mail de Solicitações</h3>
+      <button class="btn-close-req" onclick="closeEmailModal()">✕</button>
+    </div>
+    <div class="email-body">
+      <div class="email-field">
+        <label>Destinatários (separados por ponto-e-vírgula)</label>
+        <input type="text" id="emailTo" placeholder="nome@amazon.com; outro@amazon.com">
+      </div>
+      <div class="email-field">
+        <label>Assunto</label>
+        <input type="text" id="emailSubject" value="Solicitação de Alteração — Truck Planning DF-SUL">
+      </div>
+      <div class="email-field">
+        <label>Corpo do e-mail (editável antes de copiar)</label>
+        <textarea id="emailBody"></textarea>
+      </div>
+    </div>
+    <div class="email-foot">
+      <button class="btn-req-cancel" onclick="closeEmailModal()">Fechar</button>
+      <button class="btn-copy" onclick="copyEmail()">📋 Copiar tudo</button>
+      <button class="btn-req-save" onclick="openMailto()">✉ Abrir no cliente de e-mail</button>
+    </div>
   </div>
 </div>
 </body>
