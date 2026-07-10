@@ -287,7 +287,7 @@
   .btn-req-cancel{background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:9px 16px;font-size:12px;cursor:pointer;transition:all .15s}
   .btn-req-cancel:hover{border-color:var(--text-muted);color:var(--text)}
   /* ─ "✏" button in rows ─ */
-  .btn-req-row{background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);border-radius:5px;padding:2px 7px;cursor:pointer;font-size:11px;transition:all .15s;line-height:1.4}
+  .btn-req-row{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.75);border-radius:5px;padding:2px 7px;cursor:pointer;font-size:11px;transition:all .15s;line-height:1.4;font-weight:600}
   .btn-req-row:hover{border-color:var(--amz-orange);color:var(--amz-orange);background:rgba(255,153,0,.1)}
   /* ─ Email Modal ─ */
   #emailOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2200;align-items:center;justify-content:center}
@@ -701,7 +701,7 @@ function renderAll(laneData, source='default') {
         tbody += `<tr class="${rc}"><td class="dc">${d.date}</td><td class="vc">${vl}</td><td class="sc">${sh_fmt}</td><td>${o1h}</td><td>${o2h}</td><td>${ph}</td><td>${BADGE[m]}</td><td><button class="btn-req-row" data-lane="${lane}" data-date="${d.date}" data-wk="${wk}" data-sh="${sh}" data-plan="${(d.planned||'-').replace(/"/g,'&quot;')}" onclick="openReqModalFromBtn(this)" title="Solicitar alteração">✏</button></td></tr>`;
       }
       tables += `<div class="wk-block"><div class="wk-label">${wk}</div>
-        <table><thead><tr><th>Data</th><th>Forecast<br><small>pct</small></th><th>Shuttles<br><small>nec.</small></th><th>Opção 1<br><small>Carreta+</small></th><th>Opção 2<br><small>Truck+</small></th><th>Planejado<br><small>TP</small></th><th>Status</th><th style="width:42px"></th></tr></thead>
+        <table><thead><tr><th>Data</th><th>Forecast<br><small>pct</small></th><th>Shuttles<br><small>nec.</small></th><th>Opção 1<br><small>Carreta+</small></th><th>Opção 2<br><small>Truck+</small></th><th>Planejado<br><small>TP</small></th><th>Status</th><th style="width:56px;text-align:center">Alterar</th></tr></thead>
         <tbody>${tbody}</tbody></table></div>`;
     }
     cardsHtml += `<div class="lane-card" data-lane="${lane}">
