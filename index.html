@@ -239,7 +239,7 @@
   .btn-rev.clear{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.25)}
   .btn-rev.clear:hover{background:rgba(239,68,68,.2)}
   .rev-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-  .rev-table{width:100%;border-collapse:collapse;font-size:12px}
+  .rev-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
   .rev-table thead tr{background:var(--bg)}
   .rev-table th{padding:9px 12px;font-size:10px;font-weight:700;color:#565959;text-transform:uppercase;letter-spacing:.6px;text-align:left;border-bottom:2px solid #d5d9d9;white-space:nowrap}
   .rev-table th:first-child{width:36px;text-align:center}
@@ -1138,7 +1138,7 @@ function renderRevisao() {
       <td style="text-align:center">${r.shNeed}</td>
       <td><span style="font-size:11px;font-family:monospace;color:#0f1111;background:#e8ecef;border-radius:4px;padding:2px 6px;display:inline-block">${r.currentPlan}</span></td>
       <td><span style="font-size:11px;font-family:monospace;color:#b45309;background:#fef3c7;border-radius:4px;padding:2px 6px;display:inline-block;font-weight:600">${r.proposed}</span></td>
-      <td style="width:200px;max-width:200px"><div style="width:200px;max-width:200px;overflow:hidden;font-size:11px;color:#3d4449;word-break:break-word;overflow-wrap:anywhere;white-space:normal;line-height:1.4">${r.justification||'—'}</div></td>
+      <td style="font-size:11px;color:#3d4449;word-break:break-word;overflow-wrap:anywhere;white-space:normal;line-height:1.5;vertical-align:top;padding-top:10px">${r.justification||'—'}</td>
       <td><span class="${STATUS_CLASS[r.status]||'pill-pending'}" style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">${STATUS_LABEL[r.status]||'Pendente'}</span></td>
       <td style="white-space:nowrap">
         <button style="background:#166534;border:1px solid #15803d;color:#bbf7d0;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:700" onclick="setStatus('${r.id}','approved')">✓</button>
@@ -1148,6 +1148,19 @@ function renderRevisao() {
     </tr>`).join('');
   wrap.innerHTML = `
     <table class="rev-table">
+      <colgroup>
+        <col style="width:36px">
+        <col style="width:80px">
+        <col style="width:80px">
+        <col style="width:110px">
+        <col style="width:90px">
+        <col style="width:60px">
+        <col style="width:150px">
+        <col style="width:150px">
+        <col style="width:200px">
+        <col style="width:95px">
+        <col style="width:90px">
+      </colgroup>
       <thead><tr>
         <th><input type="checkbox" style="width:14px;height:14px;accent-color:var(--amz-orange);cursor:pointer" onchange="toggleAll(this)"></th>
         <th>Node</th><th>Regional</th><th>Lane</th><th>Data</th>
